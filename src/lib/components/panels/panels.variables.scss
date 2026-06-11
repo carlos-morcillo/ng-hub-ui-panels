@@ -1,0 +1,112 @@
+// ─────────────────────────────────────────────────────────────────────────
+// `<hub-panels>` token contract — public `--hub-panels-*` defaults
+// ─────────────────────────────────────────────────────────────────────────
+//
+// Every public token is declared ONCE with its default: canonical
+// `--hub-panels-tab-*` (individual header set) chained to the layout
+// `--hub-panels-*` set, then `--hub-sys-*` / `--hub-ref-*`, then a literal.
+// The view stylesheets consume the tokens bare. `:where()` keeps the defaults
+// at zero specificity so any theme rule (e.g. `hub-panels { … }`) wins.
+//
+// The `--hub-panels-accordion-*` family falls back to the ng-hub-ui accordion
+// contract (`--hub-accordion-*`) token-by-token, so existing accordion themes
+// keep working when `<hub-panels>` renders in accordion view.
+// ─────────────────────────────────────────────────────────────────────────
+
+:where(.hub-panels) {
+	// Strip + content
+	--hub-panels-flex-direction: row;
+	--hub-panels-border-width: var(--hub-ref-border-width, 1px);
+	--hub-panels-border-color: var(--hub-sys-border-color-default, #dee2e6);
+	--hub-panels-border-radius: var(--hub-ref-radius-md, 0.375rem);
+	--hub-panels-content-bg: var(--hub-sys-surface-page, #fff);
+	--hub-panels-content-box-shadow: none;
+	--hub-panels-content-padding-x: var(--hub-ref-space-3, 1rem);
+	--hub-panels-content-padding-y: var(--hub-ref-space-3, 1rem);
+	--hub-panels-nav-btn-width: 1.5rem;
+	--hub-panels-nav-btn-height: 1.5rem;
+	--hub-panels-backward-btn-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23212529' d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3E%3C/svg%3E");
+	--hub-panels-forward-btn-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23212529' d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+	--hub-panels-nav-link-padding-x: var(--hub-ref-space-3, 1rem);
+	--hub-panels-nav-link-padding-y: var(--hub-ref-space-2, 0.5rem);
+	--hub-panels-nav-link-color: var(--hub-sys-text-primary, #212529);
+	--hub-panels-nav-link-hover-color: var(--hub-sys-color-primary-emphasis, #0a58ca);
+	--hub-panels-nav-link-active-color: var(--hub-sys-color-primary, #0d6efd);
+	--hub-panels-nav-link-active-bg: var(--hub-sys-surface-page, #fff);
+	--hub-panels-nav-link-disabled-color: var(--hub-sys-text-muted, #6c757d);
+
+	// Individual header (chained to the layout tokens above)
+	--hub-panels-tab-font-family: var(--hub-container-font-family, var(--hub-ref-font-family-base));
+	--hub-panels-tab-font-size: var(--hub-container-font-size, var(--hub-ref-font-size-base, 1rem));
+	--hub-panels-tab-font-weight: 500;
+	--hub-panels-tab-line-height: var(--hub-ref-line-height-base, 1.5);
+	--hub-panels-tab-padding-x: var(--hub-panels-nav-link-padding-x);
+	--hub-panels-tab-padding-y: var(--hub-panels-nav-link-padding-y);
+	--hub-panels-tab-gap: var(--hub-ref-space-2, 0.5rem);
+	--hub-panels-tab-bg: transparent;
+	--hub-panels-tab-color: var(--hub-panels-nav-link-color);
+	--hub-panels-tab-border-width: var(--hub-panels-border-width);
+	--hub-panels-tab-border-style: solid;
+	--hub-panels-tab-border-color: transparent;
+	--hub-panels-tab-border-radius: var(--hub-panels-border-radius);
+	--hub-panels-tab-bg-hover: var(--hub-ref-surface-2, #f8f9fa);
+	--hub-panels-tab-color-hover: var(--hub-panels-nav-link-hover-color);
+	--hub-panels-tab-bg-active: var(--hub-panels-nav-link-active-bg);
+	--hub-panels-tab-color-active: var(--hub-panels-nav-link-active-color);
+	--hub-panels-tab-border-color-active: var(--hub-sys-color-primary, #0d6efd);
+	--hub-panels-tab-bg-disabled: transparent;
+	--hub-panels-tab-color-disabled: var(--hub-panels-nav-link-disabled-color);
+	--hub-panels-tab-focus-ring-width: var(--hub-sys-focus-ring-width, 0.25rem);
+	--hub-panels-tab-focus-ring-color: var(--hub-sys-focus-ring-color, rgba(13, 110, 253, 0.25));
+	--hub-panels-tab-transition: var(--hub-sys-transition-base, all 0.2s ease-in-out);
+
+	// Strip layout extras
+	--hub-panels-nav-gap: 0;
+	--hub-panels-pill-border-radius: 50rem;
+	--hub-panels-pill-bg-active: var(--hub-sys-color-primary, #0d6efd);
+	--hub-panels-pill-color-active: var(--hub-ref-color-white, #fff);
+	--hub-panels-remove-btn-opacity: 0.6;
+	--hub-panels-remove-btn-opacity-hover: 1;
+
+	// Accordion view (compatible with the --hub-accordion-* contract)
+	--hub-panels-accordion-color: var(--hub-accordion-color, var(--hub-sys-text-primary, #212529));
+	--hub-panels-accordion-bg: var(--hub-accordion-bg, var(--hub-sys-surface-page, #fff));
+	--hub-panels-accordion-border-width: var(--hub-accordion-border-width, var(--hub-ref-border-width, 1px));
+	--hub-panels-accordion-border-color: var(--hub-accordion-border-color, var(--hub-sys-border-color-default, #dee2e6));
+	--hub-panels-accordion-border-radius: var(--hub-accordion-border-radius, var(--hub-ref-radius-sm, 0.25rem));
+	--hub-panels-accordion-inner-border-radius: var(
+		--hub-accordion-inner-border-radius,
+		calc(var(--hub-panels-accordion-border-radius) - var(--hub-panels-accordion-border-width))
+	);
+	--hub-panels-accordion-btn-padding-x: var(--hub-accordion-btn-padding-x, 1.25rem);
+	--hub-panels-accordion-btn-padding-y: var(--hub-accordion-btn-padding-y, var(--hub-ref-space-3, 1rem));
+	--hub-panels-accordion-btn-color: var(--hub-accordion-btn-color, var(--hub-sys-text-primary, #212529));
+	--hub-panels-accordion-btn-bg: var(--hub-accordion-btn-bg, var(--hub-sys-surface-page, #fff));
+	--hub-panels-accordion-active-color: var(--hub-accordion-active-color, var(--hub-sys-color-primary, #0c63e4));
+	--hub-panels-accordion-active-bg: var(--hub-accordion-active-bg, var(--hub-sys-color-primary-subtle, #e7f1ff));
+	--hub-panels-accordion-icon-color: var(--hub-accordion-icon-color, var(--hub-panels-accordion-btn-color));
+	--hub-panels-accordion-icon-active-color: var(--hub-accordion-icon-active-color, var(--hub-panels-accordion-active-color));
+	--hub-panels-accordion-btn-icon-mask: var(--hub-accordion-btn-icon-mask, url("data:image/svg+xml;charset=UTF-8,%3Csvg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E"));
+	--hub-panels-accordion-btn-icon-width: var(--hub-accordion-btn-icon-width, 1.25rem);
+	--hub-panels-accordion-btn-icon-transform: var(--hub-accordion-btn-icon-transform, rotate(-180deg));
+	--hub-panels-accordion-btn-icon-transition: var(--hub-accordion-btn-icon-transition, transform 0.2s ease-in-out);
+	--hub-panels-accordion-btn-focus-box-shadow: var(
+		--hub-accordion-btn-focus-box-shadow,
+		0 0 0 var(--hub-sys-focus-ring-width, 0.25rem) var(--hub-sys-focus-ring-color, rgba(13, 110, 253, 0.25))
+	);
+	--hub-panels-accordion-transition: var(
+		--hub-accordion-transition,
+		color 0.15s ease-in-out,
+		background-color 0.15s ease-in-out,
+		border-color 0.15s ease-in-out,
+		box-shadow 0.15s ease-in-out,
+		border-radius 0.15s ease
+	);
+	--hub-panels-accordion-collapse-transition-duration: var(--hub-accordion-collapse-transition-duration, 0.25s);
+	--hub-panels-accordion-collapse-transition-easing: var(
+		--hub-accordion-collapse-transition-easing,
+		cubic-bezier(0.4, 0, 0.2, 1)
+	);
+	--hub-panels-accordion-body-padding-x: var(--hub-accordion-body-padding-x, 1.25rem);
+	--hub-panels-accordion-body-padding-y: var(--hub-accordion-body-padding-y, var(--hub-ref-space-3, 1rem));
+}

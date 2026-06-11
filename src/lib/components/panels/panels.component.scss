@@ -1,0 +1,219 @@
+// ─────────────────────────────────────────────────────────────────────────
+// `<hub-panels>` functional stylesheet — `tabs` / `pills` views + shared shell
+// ─────────────────────────────────────────────────────────────────────────
+//
+// Consumes the public token contract declared in `panels.variables.scss`
+// (loaded first via the component's `styleUrls`); the accordion view lives in
+// `panels.accordion.scss`. The three sheets are split by concern so each stays
+// inside the `anyComponentStyle` budget.
+//
+// ViewEncapsulation.None: all rules stay namespaced under `.hub-panels*`.
+// ─────────────────────────────────────────────────────────────────────────
+
+.hub-panels {
+	display: block;
+
+	&__header {
+		display: flex;
+		flex-direction: var(--hub-panels-flex-direction);
+		align-items: stretch;
+	}
+
+	&__scroll-btn {
+		flex: 0 0 auto;
+		align-self: center;
+		width: var(--hub-panels-nav-btn-width);
+		height: var(--hub-panels-nav-btn-height);
+		padding: 0;
+		border: 0;
+		cursor: pointer;
+		background-color: transparent;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: 1rem 1rem;
+
+		&--backward {
+			background-image: var(--hub-panels-backward-btn-bg);
+		}
+
+		&--forward {
+			background-image: var(--hub-panels-forward-btn-bg);
+		}
+	}
+
+	&__nav-scroller {
+		display: flex;
+		flex: 1 1 auto;
+		overflow-x: auto;
+		scrollbar-width: none;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
+
+	&__nav {
+		display: flex;
+		flex: 0 0 auto;
+		flex-wrap: nowrap;
+		gap: var(--hub-panels-nav-gap);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+
+		&--tabs {
+			border-bottom: var(--hub-panels-border-width) solid var(--hub-panels-border-color);
+
+			.hub-panels__nav-link {
+				// Overlap the strip border so the active tab paints on top of it.
+				margin-bottom: calc(-1 * var(--hub-panels-border-width));
+			}
+		}
+
+		&--pills {
+			gap: var(--hub-panels-nav-gap, 0.25rem);
+
+			.hub-panels__nav-link {
+				border-radius: var(--hub-panels-pill-border-radius);
+			}
+
+			.hub-panels__nav-link--active {
+				color: var(--hub-panels-pill-color-active);
+				background: var(--hub-panels-pill-bg-active);
+				border-color: transparent;
+			}
+		}
+
+		&--justified {
+			flex: 1 1 auto;
+
+			.hub-panels__nav-item {
+				flex: 1 1 0;
+			}
+
+			.hub-panels__nav-link {
+				width: 100%;
+				justify-content: center;
+			}
+		}
+
+		&--vertical {
+			flex-direction: column;
+
+			&.hub-panels__nav--tabs {
+				border-bottom: 0;
+				border-inline-end: var(--hub-panels-border-width) solid var(--hub-panels-border-color);
+
+				.hub-panels__nav-link {
+					margin-bottom: 0;
+					margin-inline-end: calc(-1 * var(--hub-panels-border-width));
+				}
+			}
+		}
+	}
+
+	&__nav-item {
+		display: flex;
+		flex: 0 0 auto;
+	}
+
+	&__nav-link {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		gap: var(--hub-panels-tab-gap);
+		padding: var(--hub-panels-tab-padding-y) var(--hub-panels-tab-padding-x);
+		font-family: var(--hub-panels-tab-font-family);
+		font-size: var(--hub-panels-tab-font-size);
+		font-weight: var(--hub-panels-tab-font-weight);
+		line-height: var(--hub-panels-tab-line-height);
+		white-space: nowrap;
+		color: var(--hub-panels-tab-color);
+		background: var(--hub-panels-tab-bg);
+		border-style: var(--hub-panels-tab-border-style);
+		border-width: var(--hub-panels-tab-border-width);
+		border-color: var(--hub-panels-tab-border-color);
+		border-start-start-radius: var(--hub-panels-tab-border-radius);
+		border-start-end-radius: var(--hub-panels-tab-border-radius);
+		cursor: pointer;
+		transition: var(--hub-panels-tab-transition);
+
+		&:hover:not(:disabled):not(.hub-panels__nav-link--active) {
+			color: var(--hub-panels-tab-color-hover);
+			background: var(--hub-panels-tab-bg-hover);
+		}
+
+		&:focus-visible {
+			z-index: 1;
+			outline: 0;
+			box-shadow: 0 0 0 var(--hub-panels-tab-focus-ring-width) var(--hub-panels-tab-focus-ring-color);
+		}
+
+		&--active {
+			color: var(--hub-panels-tab-color-active);
+			background: var(--hub-panels-tab-bg-active);
+			border-color: var(--hub-panels-tab-border-color-active);
+		}
+
+		&:disabled {
+			color: var(--hub-panels-tab-color-disabled);
+			background: var(--hub-panels-tab-bg-disabled);
+			cursor: default;
+		}
+	}
+
+	&__remove-btn {
+		display: inline-flex;
+		align-items: center;
+		line-height: 1;
+		opacity: var(--hub-panels-remove-btn-opacity);
+
+		&:hover {
+			opacity: var(--hub-panels-remove-btn-opacity-hover);
+		}
+	}
+
+	&__spacer {
+		flex: 1 1 auto;
+		border-bottom: var(--hub-panels-border-width) solid var(--hub-panels-border-color);
+	}
+
+	&__content {
+		padding: var(--hub-panels-content-padding-y) var(--hub-panels-content-padding-x);
+		background: var(--hub-panels-content-bg);
+		box-shadow: var(--hub-panels-content-box-shadow);
+
+		// Accordion view: the panels own their chrome — the content wrapper
+		// becomes a bare stacking container.
+		&--accordion {
+			padding: 0;
+			background: transparent;
+			box-shadow: none;
+		}
+	}
+
+	&__panel {
+		display: none;
+
+		&--active {
+			display: block;
+		}
+	}
+
+	&--vertical {
+		display: flex;
+		align-items: flex-start;
+
+		.hub-panels__header {
+			flex-direction: column;
+		}
+
+		.hub-panels__nav-scroller {
+			overflow: visible;
+		}
+
+		.hub-panels__content {
+			flex: 1 1 auto;
+		}
+	}
+}

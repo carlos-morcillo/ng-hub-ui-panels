@@ -1,0 +1,39 @@
+@if (accordionView()) {
+	<h2 class="hub-panels__accordion-header">
+		<button
+			type="button"
+			class="hub-panels__accordion-btn"
+			[class.hub-panels__accordion-btn--collapsed]="!active()"
+			[id]="id() + '-link'"
+			[disabled]="disabled() || tabset.formDisabled()"
+			[attr.aria-expanded]="active()"
+			[attr.aria-controls]="id()"
+			(click)="onAccordionHeaderClick()"
+			(keydown)="onAccordionHeaderKeydown($event)"
+		>
+			@if (headingRef(); as headingTemplate) {
+				<ng-container [ngTemplateOutlet]="headingTemplate" />
+			} @else {
+				{{ heading() }}
+			}
+			@if (removable()) {
+				<span class="hub-panels__remove-btn" aria-hidden="true" (click)="$event.stopPropagation(); removeSelf()">&times;</span>
+			}
+		</button>
+	</h2>
+	<div
+		class="hub-panels__accordion-collapse"
+		role="region"
+		[class.hub-panels__accordion-collapse--collapsed]="!active()"
+		[id]="id()"
+		[attr.aria-labelledby]="id() + '-link'"
+		[attr.aria-hidden]="!active()"
+		[attr.inert]="active() ? null : ''"
+	>
+		<div class="hub-panels__accordion-body">
+			<ng-content />
+		</div>
+	</div>
+} @else {
+	<ng-content />
+}

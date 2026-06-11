@@ -1,0 +1,169 @@
+// ─────────────────────────────────────────────────────────────────────────
+// `<hub-panels type="accordion">` view — disclosure panels
+// ─────────────────────────────────────────────────────────────────────────
+//
+// Consumes the `--hub-panels-accordion-*` tokens declared in
+// `panels.variables.scss` (each falling back to the ng-hub-ui
+// `--hub-accordion-*` contract). Split from the main stylesheet so each sheet
+// stays inside the `anyComponentStyle` budget.
+// ─────────────────────────────────────────────────────────────────────────
+
+.hub-panels {
+	// Accordion view: the panel is always visible (it owns its header); the
+	// body visibility is handled by the animated collapse wrapper below.
+	&__panel--accordion {
+		display: block;
+		color: var(--hub-panels-accordion-color);
+		background-color: var(--hub-panels-accordion-bg);
+		border: var(--hub-panels-accordion-border-width) solid var(--hub-panels-accordion-border-color);
+
+		&:not(:first-of-type) {
+			border-top: 0;
+		}
+
+		&:first-of-type {
+			border-start-start-radius: var(--hub-panels-accordion-border-radius);
+			border-start-end-radius: var(--hub-panels-accordion-border-radius);
+
+			> .hub-panels__accordion-header .hub-panels__accordion-btn {
+				border-start-start-radius: var(--hub-panels-accordion-inner-border-radius);
+				border-start-end-radius: var(--hub-panels-accordion-inner-border-radius);
+			}
+		}
+
+		&:last-of-type {
+			border-end-start-radius: var(--hub-panels-accordion-border-radius);
+			border-end-end-radius: var(--hub-panels-accordion-border-radius);
+
+			> .hub-panels__accordion-header .hub-panels__accordion-btn--collapsed {
+				border-end-start-radius: var(--hub-panels-accordion-inner-border-radius);
+				border-end-end-radius: var(--hub-panels-accordion-inner-border-radius);
+			}
+
+			> .hub-panels__accordion-collapse {
+				border-end-start-radius: var(--hub-panels-accordion-border-radius);
+				border-end-end-radius: var(--hub-panels-accordion-border-radius);
+			}
+		}
+	}
+
+	&__accordion-header {
+		margin: 0;
+	}
+
+	&__accordion-btn {
+		position: relative;
+		display: flex;
+		align-items: center;
+		width: 100%;
+		gap: var(--hub-panels-tab-gap);
+		padding: var(--hub-panels-accordion-btn-padding-y) var(--hub-panels-accordion-btn-padding-x);
+		font-family: var(--hub-panels-tab-font-family);
+		font-size: var(--hub-panels-tab-font-size);
+		line-height: var(--hub-panels-tab-line-height);
+		text-align: left;
+		color: var(--hub-panels-accordion-btn-color);
+		background-color: var(--hub-panels-accordion-btn-bg);
+		border: 0;
+		border-radius: 0;
+		overflow-anchor: none;
+		transition: var(--hub-panels-accordion-transition);
+		cursor: pointer;
+
+		// Chevron — masked so the icon colour stays tokenized.
+		&::after {
+			flex-shrink: 0;
+			width: var(--hub-panels-accordion-btn-icon-width);
+			height: var(--hub-panels-accordion-btn-icon-width);
+			margin-left: auto;
+			content: '';
+			background-color: var(--hub-panels-accordion-icon-active-color);
+			mask-image: var(--hub-panels-accordion-btn-icon-mask);
+			mask-repeat: no-repeat;
+			mask-size: contain;
+			mask-position: center;
+			transform: var(--hub-panels-accordion-btn-icon-transform);
+			transition: var(--hub-panels-accordion-btn-icon-transition);
+		}
+
+		// Expanded state (button without the collapsed modifier).
+		&:not(.hub-panels__accordion-btn--collapsed) {
+			color: var(--hub-panels-accordion-active-color);
+			background-color: var(--hub-panels-accordion-active-bg);
+			box-shadow: inset 0 calc(-1 * var(--hub-panels-accordion-border-width)) 0 var(--hub-panels-accordion-border-color);
+		}
+
+		&--collapsed::after {
+			background-color: var(--hub-panels-accordion-icon-color);
+			transform: none;
+		}
+
+		&:hover:not(:disabled) {
+			z-index: 2;
+		}
+
+		&:focus-visible {
+			z-index: 3;
+			outline: 0;
+			box-shadow: var(--hub-panels-accordion-btn-focus-box-shadow);
+		}
+
+		&:disabled {
+			color: var(--hub-panels-tab-color-disabled);
+			cursor: default;
+		}
+	}
+
+	// Animated disclosure: the grid row collapses from 1fr to 0fr while the
+	// body fades and loses its vertical padding.
+	&__accordion-collapse {
+		display: grid;
+		grid-template-rows: 1fr;
+		transition: grid-template-rows var(--hub-panels-accordion-collapse-transition-duration)
+			var(--hub-panels-accordion-collapse-transition-easing);
+
+		&--collapsed {
+			grid-template-rows: 0fr;
+		}
+
+		> .hub-panels__accordion-body {
+			min-height: 0;
+			overflow: hidden;
+			opacity: 1;
+			padding: var(--hub-panels-accordion-body-padding-y) var(--hub-panels-accordion-body-padding-x);
+			transition:
+				opacity var(--hub-panels-accordion-collapse-transition-duration)
+					var(--hub-panels-accordion-collapse-transition-easing),
+				padding var(--hub-panels-accordion-collapse-transition-duration)
+					var(--hub-panels-accordion-collapse-transition-easing);
+		}
+
+		&--collapsed > .hub-panels__accordion-body {
+			opacity: 0;
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+	}
+
+	// Flush accordion: edge-to-edge panels without outer chrome.
+	&--flush {
+		.hub-panels__panel--accordion {
+			border-right: 0;
+			border-left: 0;
+			border-radius: 0;
+
+			&:first-of-type {
+				border-top: 0;
+			}
+
+			&:last-of-type {
+				border-bottom: 0;
+			}
+
+			> .hub-panels__accordion-collapse,
+			> .hub-panels__accordion-header .hub-panels__accordion-btn {
+				border-radius: 0;
+			}
+		}
+	}
+}
