@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `pills` content area is borderless by default (`--hub-panels-pill-content-border-width: 0`); themes can opt back into a bordered card by overriding that token.
 - In `multiple` tabs/pills, every active header now starts its own visible block, each block keeps the same tabs/pills chrome as a regular panel set, and the layout scrolls horizontally when the blocks exceed the available width.
 - In `multiple` tabs/pills, every visible block now stretches its content area to the full available height, matching the single-panel layouts.
+- In `multiple` vertical tabs/pills, each visible block now uses the same side-by-side header/content orientation as the regular vertical layouts.
 - `--hub-panels-pane-gap` now defaults to `0`.
 
 ## [21.1.0] - 2026-06-11

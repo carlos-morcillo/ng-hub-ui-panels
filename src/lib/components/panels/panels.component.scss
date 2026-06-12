@@ -228,6 +228,7 @@
 		min-height: 100%;
 
 		&.hub-panels--vertical {
+			flex-direction: row;
 			min-height: var(--hub-panels-pane-min-height);
 		}
 
