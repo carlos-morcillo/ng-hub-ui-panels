@@ -53,6 +53,10 @@ describe('PanelsComponent', () => {
 		return Array.from(fixture.nativeElement.querySelectorAll('.hub-panels__nav-link'));
 	}
 
+	function headerGroups(): HTMLElement[] {
+		return Array.from(fixture.nativeElement.querySelectorAll('.hub-panels__header-group'));
+	}
+
 	it('renders one nav link per panel in tabs view', async () => {
 		await settle(fixture);
 		expect(navLinks().length).toBe(3);
@@ -97,21 +101,49 @@ describe('PanelsComponent', () => {
 			host.multiple = true;
 		});
 
-		it('keeps several panes open at once', async () => {
-			await settle(fixture);
-			navLinks()[2].click();
+		it('starts with no open pane when no form value is bound', async () => {
 			await settle(fixture);
 
 			const open = fixture.nativeElement.querySelectorAll('.hub-panels__panel--active');
-			expect(open.length).toBe(2);
+			expect(open.length).toBe(0);
+			expect(headerGroups().length).toBe(1);
+		});
+
+		it('splits the strip into header groups started by active tabs', async () => {
+			await settle(fixture);
+			navLinks()[0].click();
+			navLinks()[2].click();
+			await settle(fixture);
+
+			expect(headerGroups().length).toBe(2);
+			expect(headerGroups()[0].textContent?.replace(/\s+/g, ' ').trim()).toBe('One Two');
+			expect(headerGroups()[1].textContent?.replace(/\s+/g, ' ').trim()).toBe('Three');
 			expect(fixture.nativeElement.querySelector('.hub-panels__content--multiple')).toBeTruthy();
 		});
 
-		it('toggles an open pane closed when its tab is clicked again', async () => {
+		it('includes leading inactive tabs in the first active block', async () => {
+			await settle(fixture);
+			navLinks()[1].click();
+			await settle(fixture);
+
+			expect(headerGroups().length).toBe(1);
+			expect(headerGroups()[0].textContent?.replace(/\s+/g, ' ').trim()).toBe('One Two Three');
+			expect(navLinks()[1].classList).toContain('hub-panels__nav-link--active');
+			expect(navLinks()[0].classList).not.toContain('hub-panels__nav-link--active');
+		});
+
+		it('toggles an active block closed and merges its headers into the previous block', async () => {
 			await settle(fixture);
 			navLinks()[0].click();
+			navLinks()[2].click();
 			await settle(fixture);
-			expect(navLinks()[0].classList).not.toContain('hub-panels__nav-link--active');
+
+			navLinks()[2].click();
+			await settle(fixture);
+
+			expect(headerGroups().length).toBe(1);
+			expect(headerGroups()[0].textContent?.replace(/\s+/g, ' ').trim()).toBe('One Two Three');
+			expect(navLinks()[2].classList).not.toContain('hub-panels__nav-link--active');
 		});
 	});
 

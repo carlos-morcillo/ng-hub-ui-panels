@@ -27,6 +27,11 @@ import { contentBoxWidth } from '../../utils/content-box-width';
 import { readByPath } from '../../utils/read-by-path';
 import type { PanelComponent } from '../panel/panel.component';
 
+interface MultipleHeaderGroup {
+	activePanel?: PanelComponent;
+	headers: PanelComponent[];
+}
+
 /**
  * Content-panels container — the hub `panels` primitive.
  *
@@ -148,6 +153,9 @@ export class PanelsComponent implements ControlValueAccessor {
 	/** Currently active panel, if any (the first one, under `multiple`). */
 	readonly activePanel = computed(() => this.panels().find((panel) => panel.active()));
 
+	/** Panel index lookup used by the strip templates and keyboard navigation. */
+	readonly panelIndexMap = computed(() => new Map(this.panels().map((panel, index) => [panel, index])));
+
 	/** Whether the container renders the accordion visualization. */
 	readonly isAccordionView = computed(() => this.type() === 'accordion');
 
@@ -167,8 +175,37 @@ export class PanelsComponent implements ControlValueAccessor {
 	 * Never true in the accordion view, where routed panels are not supported.
 	 */
 	protected readonly activePanelHasRouter = computed(
-		() => !this.isAccordionView() && !!this.activePanel()?.routerUrl()
+		() => !this.isAccordionView() && !this.allowsMultipleActive() && !!this.activePanel()?.routerUrl()
 	);
+
+	/**
+	 * In `multiple` tabs/pills, headers are partitioned into blocks. Every
+	 * active panel starts a block; following inactive headers stay visible in
+	 * that same block until the next active panel starts a new one.
+	 */
+	protected readonly multipleHeaderGroups = computed<MultipleHeaderGroup[]>(() => {
+		if (!this.allowsMultipleActive() || this.isAccordionView()) {
+			return [];
+		}
+		const panels = this.panels();
+		if (!panels.length) {
+			return [];
+		}
+		const activeIndices = panels
+			.map((panel, index) => (panel.active() ? index : -1))
+			.filter((index) => index !== -1);
+		if (!activeIndices.length) {
+			return [{ headers: panels }];
+		}
+		return activeIndices.map((activeIndex, groupIndex) => {
+			const startIndex = groupIndex === 0 ? 0 : activeIndex;
+			const endIndex = activeIndices[groupIndex + 1] ?? panels.length;
+			return {
+				activePanel: panels[activeIndex],
+				headers: panels.slice(startIndex, endIndex)
+			};
+		});
+	});
 
 	/** Whether the strip cannot scroll further backward. */
 	readonly backwardIsDisabled = signal(true);
@@ -468,6 +505,11 @@ export class PanelsComponent implements ControlValueAccessor {
 		this.updateScrollButtons();
 	}
 
+	/** Global index of a panel within the projected strip order. */
+	protected panelIndex(panel: PanelComponent): number {
+		return this.panelIndexMap().get(panel) ?? -1;
+	}
+
 	/** Scrolls the panel headers one viewport backward. */
 	protected navBackward(): void {
 		const scroller = this.navScroller()?.nativeElement;
@@ -568,6 +610,9 @@ export class PanelsComponent implements ControlValueAccessor {
 	 */
 	#ensureActivePanel(): void {
 		if (this.isAccordionView() || this.#formValue !== null) {
+			return;
+		}
+		if (this.allowsMultipleActive()) {
 			return;
 		}
 		const panels = this.panels();

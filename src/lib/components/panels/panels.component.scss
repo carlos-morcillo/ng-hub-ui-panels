@@ -27,6 +27,15 @@
 		flex-direction: var(--hub-panels-flex-direction);
 		align-items: stretch;
 		background: var(--hub-panels-header-bg);
+
+		&--multiple {
+			gap: var(--hub-panels-pane-gap);
+		}
+	}
+
+	&__header-group {
+		flex: 1 1 0;
+		min-width: 0;
 	}
 
 	&__scroll-btn {
@@ -219,7 +228,7 @@
 			padding: 0;
 
 			> .hub-panels__panel--active {
-				flex: 1 1 var(--hub-panels-pane-min-width);
+				flex: 1 1 0;
 				min-width: var(--hub-panels-pane-min-width);
 				padding: var(--hub-panels-content-padding-y) var(--hub-panels-content-padding-x);
 				background: var(--hub-panels-content-bg);

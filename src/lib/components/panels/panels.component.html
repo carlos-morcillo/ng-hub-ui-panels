@@ -1,79 +1,134 @@
 @if (!isAccordionView()) {
-	<div class="hub-panels__header">
-		@if (scrollable() && !backwardIsDisabled()) {
-			<button
-				#prevBtn
-				type="button"
-				class="hub-panels__scroll-btn hub-panels__scroll-btn--backward"
-				[attr.aria-label]="config.scrollBackwardAriaLabel"
-				(click)="navBackward()"
-			></button>
-		}
-
-		<div #navScroller class="hub-panels__nav-scroller" (scroll)="onScroll()">
-			<ul
-				class="hub-panels__nav"
-				role="tablist"
-				[attr.aria-label]="config.ariaLabel"
-				[attr.aria-orientation]="vertical() ? 'vertical' : null"
-				[class.hub-panels__nav--tabs]="type() === 'tabs'"
-				[class.hub-panels__nav--pills]="type() === 'pills'"
-				[class.hub-panels__nav--vertical]="vertical()"
-				[class.hub-panels__nav--justified]="justified()"
-			>
-				@for (panel of panels(); track panel; let index = $index) {
-					<li
-						class="hub-panels__nav-item"
-						[class]="panel.customClass()"
-						[class.hub-panels__nav-item--active]="panel.active()"
-						[class.hub-panels__nav-item--disabled]="panel.disabled()"
+	@if (multiple()) {
+		<div class="hub-panels__header hub-panels__header--multiple">
+			@for (group of multipleHeaderGroups(); track group.activePanel ?? group.headers[0]) {
+				<div class="hub-panels__header-group">
+					<ul
+						class="hub-panels__nav"
+						role="tablist"
+						[attr.aria-label]="config.ariaLabel"
+						[class.hub-panels__nav--tabs]="type() === 'tabs'"
+						[class.hub-panels__nav--pills]="type() === 'pills'"
+						[class.hub-panels__nav--justified]="justified()"
 					>
-						<button
-							type="button"
-							class="hub-panels__nav-link"
-							role="tab"
-							[id]="panel.id() + '-link'"
-							[class.hub-panels__nav-link--active]="panel.active()"
-							[class.hub-panels__nav-link--disabled]="panel.disabled()"
-							[disabled]="panel.disabled() || formDisabled()"
-							[attr.aria-controls]="panel.id()"
-							[attr.aria-selected]="panel.active()"
-							[attr.tabindex]="panel.active() || (!activePanel() && index === 0) ? null : -1"
-							(click)="selectPanel(panel)"
-							(keydown)="onPanelKeydown($event, index)"
-						>
-							@if (panel.headingRef(); as headingRef) {
-								<ng-container [ngTemplateOutlet]="headingRef" />
-							} @else {
-								{{ panel.heading() }}
-							}
-							@if (panel.removable()) {
-								<span
-									class="hub-panels__remove-btn"
-									aria-hidden="true"
-									(click)="$event.stopPropagation(); removePanel(panel)"
-									>&times;</span
+						@for (panel of group.headers; track panel) {
+							<li
+								class="hub-panels__nav-item"
+								[class]="panel.customClass()"
+								[class.hub-panels__nav-item--active]="panel.active()"
+								[class.hub-panels__nav-item--disabled]="panel.disabled()"
+							>
+								<button
+									type="button"
+									class="hub-panels__nav-link"
+									role="tab"
+									[id]="panel.id() + '-link'"
+									[class.hub-panels__nav-link--active]="panel.active()"
+									[class.hub-panels__nav-link--disabled]="panel.disabled()"
+									[disabled]="panel.disabled() || formDisabled()"
+									[attr.aria-controls]="panel.id()"
+									[attr.aria-selected]="panel.active()"
+									[attr.tabindex]="panel.active() || (!activePanel() && panelIndex(panel) === 0) ? null : -1"
+									(click)="selectPanel(panel)"
+									(keydown)="onPanelKeydown($event, panelIndex(panel))"
 								>
-							}
-						</button>
-					</li>
-				}
-			</ul>
-			@if (!justified() && type() !== 'pills') {
-				<div class="hub-panels__spacer"></div>
+									@if (panel.headingRef(); as headingRef) {
+										<ng-container [ngTemplateOutlet]="headingRef" />
+									} @else {
+										{{ panel.heading() }}
+									}
+									@if (panel.removable()) {
+										<span
+											class="hub-panels__remove-btn"
+											aria-hidden="true"
+											(click)="$event.stopPropagation(); removePanel(panel)"
+											>&times;</span
+										>
+									}
+								</button>
+							</li>
+						}
+					</ul>
+				</div>
 			}
 		</div>
+	} @else {
+		<div class="hub-panels__header">
+			@if (scrollable() && !backwardIsDisabled()) {
+				<button
+					#prevBtn
+					type="button"
+					class="hub-panels__scroll-btn hub-panels__scroll-btn--backward"
+					[attr.aria-label]="config.scrollBackwardAriaLabel"
+					(click)="navBackward()"
+				></button>
+			}
 
-		@if (scrollable() && !forwardIsDisabled()) {
-			<button
-				#nextBtn
-				type="button"
-				class="hub-panels__scroll-btn hub-panels__scroll-btn--forward"
-				[attr.aria-label]="config.scrollForwardAriaLabel"
-				(click)="navForward()"
-			></button>
-		}
-	</div>
+			<div #navScroller class="hub-panels__nav-scroller" (scroll)="onScroll()">
+				<ul
+					class="hub-panels__nav"
+					role="tablist"
+					[attr.aria-label]="config.ariaLabel"
+					[attr.aria-orientation]="vertical() ? 'vertical' : null"
+					[class.hub-panels__nav--tabs]="type() === 'tabs'"
+					[class.hub-panels__nav--pills]="type() === 'pills'"
+					[class.hub-panels__nav--vertical]="vertical()"
+					[class.hub-panels__nav--justified]="justified()"
+				>
+					@for (panel of panels(); track panel; let index = $index) {
+						<li
+							class="hub-panels__nav-item"
+							[class]="panel.customClass()"
+							[class.hub-panels__nav-item--active]="panel.active()"
+							[class.hub-panels__nav-item--disabled]="panel.disabled()"
+						>
+							<button
+								type="button"
+								class="hub-panels__nav-link"
+								role="tab"
+								[id]="panel.id() + '-link'"
+								[class.hub-panels__nav-link--active]="panel.active()"
+								[class.hub-panels__nav-link--disabled]="panel.disabled()"
+								[disabled]="panel.disabled() || formDisabled()"
+								[attr.aria-controls]="panel.id()"
+								[attr.aria-selected]="panel.active()"
+								[attr.tabindex]="panel.active() || (!activePanel() && index === 0) ? null : -1"
+								(click)="selectPanel(panel)"
+								(keydown)="onPanelKeydown($event, index)"
+							>
+								@if (panel.headingRef(); as headingRef) {
+									<ng-container [ngTemplateOutlet]="headingRef" />
+								} @else {
+									{{ panel.heading() }}
+								}
+								@if (panel.removable()) {
+									<span
+										class="hub-panels__remove-btn"
+										aria-hidden="true"
+										(click)="$event.stopPropagation(); removePanel(panel)"
+										>&times;</span
+									>
+								}
+							</button>
+						</li>
+					}
+				</ul>
+				@if (!justified() && type() !== 'pills') {
+					<div class="hub-panels__spacer"></div>
+				}
+			</div>
+
+			@if (scrollable() && !forwardIsDisabled()) {
+				<button
+					#nextBtn
+					type="button"
+					class="hub-panels__scroll-btn hub-panels__scroll-btn--forward"
+					[attr.aria-label]="config.scrollForwardAriaLabel"
+					(click)="navForward()"
+				></button>
+			}
+		</div>
+	}
 }
 
 <div
