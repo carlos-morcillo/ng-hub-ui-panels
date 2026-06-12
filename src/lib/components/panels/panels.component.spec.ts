@@ -54,7 +54,11 @@ describe('PanelsComponent', () => {
 	}
 
 	function headerGroups(): HTMLElement[] {
-		return Array.from(fixture.nativeElement.querySelectorAll('.hub-panels__header-group'));
+		return Array.from(fixture.nativeElement.querySelectorAll('.hub-panels__multiple-block .hub-panels__nav'));
+	}
+
+	function multipleBlocks(): HTMLElement[] {
+		return Array.from(fixture.nativeElement.querySelectorAll('.hub-panels__multiple-block'));
 	}
 
 	it('renders one nav link per panel in tabs view', async () => {
@@ -106,7 +110,7 @@ describe('PanelsComponent', () => {
 
 			const open = fixture.nativeElement.querySelectorAll('.hub-panels__panel--active');
 			expect(open.length).toBe(0);
-			expect(headerGroups().length).toBe(1);
+			expect(multipleBlocks().length).toBe(1);
 		});
 
 		it('splits the strip into header groups started by active tabs', async () => {
@@ -115,10 +119,9 @@ describe('PanelsComponent', () => {
 			navLinks()[2].click();
 			await settle(fixture);
 
-			expect(headerGroups().length).toBe(2);
+			expect(multipleBlocks().length).toBe(2);
 			expect(headerGroups()[0].textContent?.replace(/\s+/g, ' ').trim()).toBe('One Two');
 			expect(headerGroups()[1].textContent?.replace(/\s+/g, ' ').trim()).toBe('Three');
-			expect(fixture.nativeElement.querySelector('.hub-panels__content--multiple')).toBeTruthy();
 		});
 
 		it('includes leading inactive tabs in the first active block', async () => {
@@ -126,7 +129,7 @@ describe('PanelsComponent', () => {
 			navLinks()[1].click();
 			await settle(fixture);
 
-			expect(headerGroups().length).toBe(1);
+			expect(multipleBlocks().length).toBe(1);
 			expect(headerGroups()[0].textContent?.replace(/\s+/g, ' ').trim()).toBe('One Two Three');
 			expect(navLinks()[1].classList).toContain('hub-panels__nav-link--active');
 			expect(navLinks()[0].classList).not.toContain('hub-panels__nav-link--active');
@@ -141,9 +144,19 @@ describe('PanelsComponent', () => {
 			navLinks()[2].click();
 			await settle(fixture);
 
-			expect(headerGroups().length).toBe(1);
+			expect(multipleBlocks().length).toBe(1);
 			expect(headerGroups()[0].textContent?.replace(/\s+/g, ' ').trim()).toBe('One Two Three');
 			expect(navLinks()[2].classList).not.toContain('hub-panels__nav-link--active');
+		});
+
+		it('applies the minimum block width to each visible multiple block', async () => {
+			await settle(fixture);
+			navLinks()[0].click();
+			navLinks()[2].click();
+			await settle(fixture);
+
+			const firstBlock = multipleBlocks()[0];
+			expect(getComputedStyle(firstBlock).minWidth).toBe('256px');
 		});
 	});
 

@@ -101,13 +101,13 @@ Used by the `tabs` and `pills` strip headers.
 
 ## Multiple Selection
 
-Layout of the side-by-side (or stacked) panes when the `tabs` / `pills` views use `multiple`.
+Layout of the block-based multiple view when the `tabs` / `pills` views use `multiple`.
 
 | Variable | Default |
 | --- | --- |
 | `--hub-panels-pane-min-width` | `16rem` |
 | `--hub-panels-pane-min-height` | `8rem` |
-| `--hub-panels-pane-gap` | `1rem` |
+| `--hub-panels-pane-gap` | `0` |
 
 ---
 

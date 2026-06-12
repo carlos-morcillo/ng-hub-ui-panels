@@ -14,6 +14,7 @@ import {
 	Renderer2,
 	signal,
 	viewChild,
+	viewChildren,
 	ViewEncapsulation
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -111,6 +112,12 @@ export class PanelsComponent implements ControlValueAccessor {
 
 	/** Forward scroll button (only rendered while it can scroll forward). */
 	readonly nextBtn = viewChild<ElementRef<HTMLElement>>('nextBtn');
+
+	/** Parking lot that owns the projected panel hosts before they are placed. */
+	readonly contentRoot = viewChild<ElementRef<HTMLElement>>('contentRoot');
+
+	/** Visible block hosts used by `multiple` tabs / pills. */
+	readonly multiplePaneHosts = viewChildren<ElementRef<HTMLElement>>('multiplePaneHost');
 
 	/** Emitted when the user activates (opens) a different panel. */
 	readonly panelChange = output<PanelChangeEvent>();
@@ -216,6 +223,7 @@ export class PanelsComponent implements ControlValueAccessor {
 	#isDestroyed = false;
 	#syncScheduled = false;
 	#viewInitialised = false;
+	#placementScheduled = false;
 
 	/** Last value written by the bound form control; `null` when no form. */
 	#formValue: unknown[] | null = null;
@@ -235,6 +243,7 @@ export class PanelsComponent implements ControlValueAccessor {
 			// Re-apply any form value written before the panels' inputs were bound.
 			this.#applyFormValue();
 			this.#ensureActivePanel();
+			this.#schedulePanelPlacement();
 			this.#router.events
 				.pipe(
 					filter((event) => event instanceof NavigationEnd),
@@ -311,6 +320,7 @@ export class PanelsComponent implements ControlValueAccessor {
 			}
 			this.#emitFormValue();
 			this.#onTouched();
+			this.#schedulePanelPlacement();
 			return;
 		}
 		if (panel.active()) {
@@ -322,6 +332,7 @@ export class PanelsComponent implements ControlValueAccessor {
 		this.panelChange.emit({ prev: previousPanel, current: panel });
 		this.#emitFormValue();
 		this.#onTouched();
+		this.#schedulePanelPlacement();
 	}
 
 	/**
@@ -342,6 +353,7 @@ export class PanelsComponent implements ControlValueAccessor {
 		}
 		this.#emitFormValue();
 		this.#onTouched();
+		this.#schedulePanelPlacement();
 	}
 
 	/**
@@ -598,8 +610,53 @@ export class PanelsComponent implements ControlValueAccessor {
 			}
 			this.#applyFormValue();
 			this.#ensureActivePanel();
+			this.#placeProjectedPanels();
 			this.updateScrollButtons();
 		});
+	}
+
+	/** Coalesces DOM moves for the projected `hub-panel` hosts. */
+	#schedulePanelPlacement(): void {
+		if (this.#placementScheduled || this.#isDestroyed) {
+			return;
+		}
+		this.#placementScheduled = true;
+		queueMicrotask(() => {
+			this.#placementScheduled = false;
+			if (this.#isDestroyed || !this.#viewInitialised) {
+				return;
+			}
+			this.#placeProjectedPanels();
+		});
+	}
+
+	/** Moves projected panel hosts into their visible multiple-block container. */
+	#placeProjectedPanels(): void {
+		const contentRoot = this.contentRoot()?.nativeElement;
+		if (!contentRoot) {
+			return;
+		}
+		if (!this.allowsMultipleActive() || this.isAccordionView()) {
+			for (const panel of this.panels()) {
+				const panelElement = panel.elementRef.nativeElement;
+				if (panelElement.parentElement !== contentRoot) {
+					this.#renderer.appendChild(contentRoot, panelElement);
+				}
+			}
+			return;
+		}
+		const hostMap = new Map(
+			this.multiplePaneHosts()
+				.map((host) => host.nativeElement)
+				.map((host) => [host.dataset['panelId'] ?? '', host] as const)
+		);
+		for (const panel of this.panels()) {
+			const panelElement = panel.elementRef.nativeElement;
+			const targetHost = hostMap.get(panel.id()) ?? contentRoot;
+			if (panelElement.parentElement !== targetHost) {
+				this.#renderer.appendChild(targetHost, panelElement);
+			}
+		}
 	}
 
 	/**

@@ -83,11 +83,11 @@
 	--hub-panels-nav-content-gap: var(--hub-ref-space-2, 0.5rem);
 
 	// Multiple-selection layout (tabs / pills with `multiple`): several panes
-	// render side by side (or stacked, when vertical). Each open pane is at
-	// least this wide/tall; the content area scrolls when they overflow.
+	// render side by side. Each visible block is at least this wide; the
+	// layout scrolls horizontally when the blocks no longer fit.
 	--hub-panels-pane-min-width: 16rem;
 	--hub-panels-pane-min-height: 8rem;
-	--hub-panels-pane-gap: var(--hub-ref-space-3, 1rem);
+	--hub-panels-pane-gap: 0;
 
 	// Accordion view (compatible with the --hub-accordion-* contract)
 	--hub-panels-accordion-color: var(--hub-accordion-color, var(--hub-sys-text-primary, #212529));
