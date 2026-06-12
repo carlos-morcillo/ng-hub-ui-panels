@@ -5,6 +5,32 @@ All notable changes to the ng-hub-ui-panels library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [21.1.1] - 2026-06-12
+
+### Added
+- New token: `--hub-panels-header-bg`, used by the tabs/pills strip background. It defaults to `--hub-panels-content-bg`, so the default theme remains unchanged while custom themes can give the header strip its own surface colour.
+- New token: `--hub-panels-pill-content-border-width`, which controls the bordered card chrome in the `pills` content area.
+
+### Changed
+- The active header background now defaults to `--hub-panels-content-bg`, keeping the active tab/panel fusion aligned automatically when the content surface is rethemed.
+- The `pills` content area is borderless by default (`--hub-panels-pill-content-border-width: 0`); themes can opt back into a bordered card by overriding that token.
+
+## [21.1.0] - 2026-06-11
+
+### Added
+- Multiple selection in the `tabs` / `pills` views: with `multiple`, several panels can be open at once. Each open pane becomes its own bordered box placed next to the others — side by side when the strip is horizontal, stacked when it is `vertical` — sharing the space with a per-pane minimum and scrolling on overflow. The form value is an array.
+- New tokens: `--hub-panels-pane-min-width`, `--hub-panels-pane-min-height`, `--hub-panels-pane-gap`, `--hub-panels-nav-content-gap`, `--hub-panels-pill-gap`.
+
+### Fixed
+- **Accordion content was not rendered.** The panel template used two unselected `<ng-content>` slots (one per `@if`/`@else` branch); Angular bound projection to the strip-view slot, so the accordion body was always empty. Replaced with a single projection slot, fixing the missing accordion content.
+- `tabs` and vertical `tabs` now render as a **single bordered box** around the strip and the content together (one outer border plus an internal divider), instead of two separate boxes. The active tab merges into the content across the divider.
+- `pills` view gains spacing between the strip and a bordered content card (`--hub-panels-nav-content-gap`).
+
+### Changed
+- The header strip now scrolls smoothly (`scroll-behavior: smooth`).
+- Disabled headers show the `not-allowed` cursor.
+- `<hub-panels>` now always spans 100% of its parent's width and applies `box-sizing: border-box`.
+
 ## [21.0.0] - 2026-06-11
 
 ### Added

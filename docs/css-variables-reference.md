@@ -45,6 +45,7 @@ you write — e.g. `hub-panels { --hub-panels-tab-color-active: #198754; }` — 
 | `--hub-panels-border-color` | `#dee2e6` |
 | `--hub-panels-border-radius` | `0.375rem` |
 | `--hub-panels-content-bg` | `#fff` |
+| `--hub-panels-header-bg` | `var(--hub-panels-content-bg)` |
 | `--hub-panels-content-box-shadow` | `none` |
 | `--hub-panels-content-padding-x` | `1rem` |
 | `--hub-panels-content-padding-y` | `1rem` |
@@ -74,6 +75,8 @@ Used by the `tabs` and `pills` strip headers.
 | `--hub-panels-tab-color-active` | `#0d6efd` |
 | `--hub-panels-tab-bg-active` | `#fff` |
 | `--hub-panels-tab-border-color-active` | `#0d6efd` |
+| `--hub-panels-tab-active-shadow` | `0 -0.25rem 0.5rem rgba(0, 0, 0, 0.06)` |
+| `--hub-panels-tab-active-shadow-vertical` | `-0.25rem 0 0.5rem rgba(0, 0, 0, 0.06)` |
 | `--hub-panels-tab-color-disabled` | `#6c757d` |
 | `--hub-panels-tab-focus-ring-width` | `0.25rem` |
 | `--hub-panels-tab-focus-ring-color` | `rgba(13, 110, 253, 0.25)` |
@@ -90,6 +93,21 @@ Used by the `tabs` and `pills` strip headers.
 | `--hub-panels-pill-border-radius` | `50rem` |
 | `--hub-panels-pill-bg-active` | `#0d6efd` |
 | `--hub-panels-pill-color-active` | `#fff` |
+| `--hub-panels-pill-gap` | `0.5rem` |
+| `--hub-panels-pill-content-border-width` | `0` |
+| `--hub-panels-nav-content-gap` | `1rem` |
+
+---
+
+## Multiple Selection
+
+Layout of the side-by-side (or stacked) panes when the `tabs` / `pills` views use `multiple`.
+
+| Variable | Default |
+| --- | --- |
+| `--hub-panels-pane-min-width` | `16rem` |
+| `--hub-panels-pane-min-height` | `8rem` |
+| `--hub-panels-pane-gap` | `1rem` |
 
 ---
 

@@ -20,6 +20,7 @@
 	--hub-panels-border-color: var(--hub-sys-border-color-default, #dee2e6);
 	--hub-panels-border-radius: var(--hub-ref-radius-md, 0.375rem);
 	--hub-panels-content-bg: var(--hub-sys-surface-page, #fff);
+	--hub-panels-header-bg: var(--hub-panels-content-bg);
 	--hub-panels-content-box-shadow: none;
 	--hub-panels-content-padding-x: var(--hub-ref-space-3, 1rem);
 	--hub-panels-content-padding-y: var(--hub-ref-space-3, 1rem);
@@ -32,7 +33,7 @@
 	--hub-panels-nav-link-color: var(--hub-sys-text-primary, #212529);
 	--hub-panels-nav-link-hover-color: var(--hub-sys-color-primary-emphasis, #0a58ca);
 	--hub-panels-nav-link-active-color: var(--hub-sys-color-primary, #0d6efd);
-	--hub-panels-nav-link-active-bg: var(--hub-sys-surface-page, #fff);
+	--hub-panels-nav-link-active-bg: var(--hub-panels-content-bg);
 	--hub-panels-nav-link-disabled-color: var(--hub-sys-text-muted, #6c757d);
 
 	// Individual header (chained to the layout tokens above)
@@ -59,14 +60,34 @@
 	--hub-panels-tab-focus-ring-width: var(--hub-sys-focus-ring-width, 0.25rem);
 	--hub-panels-tab-focus-ring-color: var(--hub-sys-focus-ring-color, rgba(13, 110, 253, 0.25));
 	--hub-panels-tab-transition: var(--hub-sys-transition-base, all 0.2s ease-in-out);
+	// Soft elevation shown on the active tab in the boxed `tabs` view (pointing
+	// away from the panel — up for a horizontal strip, towards the inline-start
+	// for a vertical one), plus the breathing room the strip needs for it to be
+	// visible.
+	--hub-panels-tab-active-shadow: 0 -0.25rem 0.5rem rgba(0, 0, 0, 0.06);
+	--hub-panels-tab-active-shadow-vertical: -0.25rem 0 0.5rem rgba(0, 0, 0, 0.06);
+	--hub-panels-strip-margin-top: var(--hub-ref-space-2, 0.5rem);
 
 	// Strip layout extras
 	--hub-panels-nav-gap: 0;
 	--hub-panels-pill-border-radius: 50rem;
 	--hub-panels-pill-bg-active: var(--hub-sys-color-primary, #0d6efd);
 	--hub-panels-pill-color-active: var(--hub-ref-color-white, #fff);
+	--hub-panels-pill-gap: var(--hub-ref-space-2, 0.5rem);
+	--hub-panels-pill-content-border-width: 0;
 	--hub-panels-remove-btn-opacity: 0.6;
 	--hub-panels-remove-btn-opacity-hover: 1;
+
+	// Gap between the header strip and the content area (pills view, and the
+	// vertical strip's inline gap).
+	--hub-panels-nav-content-gap: var(--hub-ref-space-2, 0.5rem);
+
+	// Multiple-selection layout (tabs / pills with `multiple`): several panes
+	// render side by side (or stacked, when vertical). Each open pane is at
+	// least this wide/tall; the content area scrolls when they overflow.
+	--hub-panels-pane-min-width: 16rem;
+	--hub-panels-pane-min-height: 8rem;
+	--hub-panels-pane-gap: var(--hub-ref-space-3, 1rem);
 
 	// Accordion view (compatible with the --hub-accordion-* contract)
 	--hub-panels-accordion-color: var(--hub-accordion-color, var(--hub-sys-text-primary, #212529));

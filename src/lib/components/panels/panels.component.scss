@@ -12,11 +12,21 @@
 
 .hub-panels {
 	display: block;
+	width: 100%;
+	box-sizing: border-box;
+
+	&,
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
 
 	&__header {
 		display: flex;
 		flex-direction: var(--hub-panels-flex-direction);
 		align-items: stretch;
+		background: var(--hub-panels-header-bg);
 	}
 
 	&__scroll-btn {
@@ -45,6 +55,9 @@
 		display: flex;
 		flex: 1 1 auto;
 		overflow-x: auto;
+		background: var(--hub-panels-header-bg);
+		// Smooth, eased scrolling for the strip's scroll buttons.
+		scroll-behavior: smooth;
 		scrollbar-width: none;
 
 		&::-webkit-scrollbar {
@@ -71,7 +84,7 @@
 		}
 
 		&--pills {
-			gap: var(--hub-panels-nav-gap, 0.25rem);
+			gap: var(--hub-panels-pill-gap);
 
 			.hub-panels__nav-link {
 				border-radius: var(--hub-panels-pill-border-radius);
@@ -158,7 +171,7 @@
 		&:disabled {
 			color: var(--hub-panels-tab-color-disabled);
 			background: var(--hub-panels-tab-bg-disabled);
-			cursor: default;
+			cursor: not-allowed;
 		}
 	}
 
@@ -175,6 +188,7 @@
 
 	&__spacer {
 		flex: 1 1 auto;
+		background: var(--hub-panels-header-bg);
 		border-bottom: var(--hub-panels-border-width) solid var(--hub-panels-border-color);
 	}
 
@@ -190,6 +204,29 @@
 			background: transparent;
 			box-shadow: none;
 		}
+
+		// Multiple selection (tabs / pills): each open pane becomes its own
+		// bordered box placed next to the others — side by side here (horizontal
+		// strip), stacked further down (vertical strip). The panes share the
+		// width/height equally, each at least `--hub-panels-pane-min-width`, and
+		// the area scrolls when they overflow.
+		&--multiple:not(.hub-panels__content--accordion) {
+			display: flex;
+			flex-wrap: nowrap;
+			gap: var(--hub-panels-pane-gap);
+			overflow-x: auto;
+			scroll-behavior: smooth;
+			padding: 0;
+
+			> .hub-panels__panel--active {
+				flex: 1 1 var(--hub-panels-pane-min-width);
+				min-width: var(--hub-panels-pane-min-width);
+				padding: var(--hub-panels-content-padding-y) var(--hub-panels-content-padding-x);
+				background: var(--hub-panels-content-bg);
+				border: var(--hub-panels-border-width) solid var(--hub-panels-border-color);
+				border-radius: var(--hub-panels-border-radius);
+			}
+		}
 	}
 
 	&__panel {
@@ -200,9 +237,51 @@
 		}
 	}
 
+	// ── Boxed `tabs` view ────────────────────────────────────────────────
+	// A SINGLE border surrounds the whole component (header + content together).
+	// The strip's bottom border is the internal divider; the active tab merges
+	// into the content below it by erasing that divider underneath itself.
+	&--tabs:not(.hub-panels--vertical):not(.hub-panels--multiple) {
+		// The panel is bordered on its left, right and bottom; the seam under the
+		// tabs is its top edge. The active tab keeps its top/left/right border and
+		// drops its bottom one, so a SINGLE outline wraps the active tab together
+		// with the panel below it. Inactive tabs sit on that seam.
+		> .hub-panels__header {
+			// Breathing room so the active tab's elevation shadow is visible.
+			margin-top: var(--hub-panels-strip-margin-top);
+		}
+
+		> .hub-panels__content {
+			border: var(--hub-panels-border-width) solid var(--hub-panels-border-color);
+			border-top: 0;
+			border-end-start-radius: var(--hub-panels-border-radius);
+			border-end-end-radius: var(--hub-panels-border-radius);
+		}
+
+		.hub-panels__nav--tabs .hub-panels__nav-link--active {
+			border-color: var(--hub-panels-border-color);
+			border-bottom-color: var(--hub-panels-tab-bg-active);
+			box-shadow: var(--hub-panels-tab-active-shadow);
+		}
+	}
+
+	// ── `pills` view ─────────────────────────────────────────────────────
+	// Detached strip with breathing room above a bordered content card.
+	&--pills {
+		> .hub-panels__header {
+			margin-bottom: var(--hub-panels-nav-content-gap);
+		}
+
+		> .hub-panels__content {
+			border: var(--hub-panels-pill-content-border-width) solid var(--hub-panels-border-color);
+			border-radius: var(--hub-panels-border-radius);
+		}
+	}
+
+	// ── Vertical strip (`tabs` / `pills`) ────────────────────────────────
 	&--vertical {
 		display: flex;
-		align-items: flex-start;
+		align-items: stretch;
 
 		.hub-panels__header {
 			flex-direction: column;
@@ -214,6 +293,96 @@
 
 		.hub-panels__content {
 			flex: 1 1 auto;
+			min-width: 0;
+		}
+	}
+
+	// Boxed vertical tabs — the same effect as the horizontal strip, rotated:
+	// the panel carries the full border and its inline-start side is the seam.
+	// The active tab keeps its top/inline-start/bottom border and opens into the
+	// panel on its inline-end, so a SINGLE outline wraps [active tab + panel].
+	&--tabs.hub-panels--vertical:not(.hub-panels--multiple) {
+		> .hub-panels__header {
+			// Breathing room so the active tab's elevation shadow is visible.
+			margin-inline-start: var(--hub-panels-strip-margin-top);
+			align-self: stretch;
+			min-height: 0;
+		}
+
+		// The horizontal spacer is meaningless here and would widen the strip.
+		.hub-panels__spacer {
+			display: none;
+		}
+
+		// The strip fills the full height so its inline-end border (the seam)
+		// runs the whole length of the panel, exactly like the horizontal
+		// strip's bottom border spans the full width.
+		.hub-panels__nav-scroller {
+			flex: 1 1 auto;
+			align-self: stretch;
+			min-height: 100%;
+		}
+
+		.hub-panels__nav--vertical {
+			flex: 1 1 auto;
+			align-self: stretch;
+			min-height: 100%;
+		}
+
+		// Tabs fill the strip width so their inline-end edge meets the seam.
+		.hub-panels__nav--vertical .hub-panels__nav-item {
+			width: 100%;
+		}
+
+		.hub-panels__nav--vertical .hub-panels__nav-link {
+			width: calc(100% + var(--hub-panels-border-width));
+			justify-content: flex-start;
+			margin-bottom: 0;
+			border-start-start-radius: var(--hub-panels-tab-border-radius);
+			border-start-end-radius: 0;
+			border-end-start-radius: var(--hub-panels-tab-border-radius);
+			border-end-end-radius: 0;
+			// Overlap the strip's inline-end seam so the active tab can erase it.
+			margin-inline-end: calc(-1 * var(--hub-panels-border-width));
+		}
+
+		// The panel is bordered on top/inline-end/bottom; the strip's inline-end
+		// border is its seam side. The active tab keeps its top/inline-start/
+		// bottom border and drops its inline-end one, so a SINGLE outline wraps
+		// [active tab + panel] and the touching sides carry no border.
+		> .hub-panels__content {
+			border: var(--hub-panels-border-width) solid var(--hub-panels-border-color);
+			border-inline-start: 0;
+			border-start-end-radius: var(--hub-panels-border-radius);
+			border-end-end-radius: var(--hub-panels-border-radius);
+		}
+
+		.hub-panels__nav--tabs .hub-panels__nav-link--active {
+			z-index: 1;
+			border-color: var(--hub-panels-border-color);
+			border-inline-end-color: var(--hub-panels-tab-bg-active);
+			box-shadow: var(--hub-panels-tab-active-shadow-vertical);
+		}
+	}
+
+	// Vertical pills: strip beside the content with an inline gap.
+	&--pills.hub-panels--vertical {
+		> .hub-panels__header {
+			margin-bottom: 0;
+			margin-inline-end: var(--hub-panels-nav-content-gap);
+		}
+	}
+
+	// Vertical multiple: open panes stack and split the available height.
+	&--vertical &__content--multiple:not(.hub-panels__content--accordion) {
+		flex-direction: column;
+		overflow-x: visible;
+		overflow-y: auto;
+
+		> .hub-panels__panel--active {
+			flex: 1 1 auto;
+			min-width: 0;
+			min-height: var(--hub-panels-pane-min-height);
 		}
 	}
 }
