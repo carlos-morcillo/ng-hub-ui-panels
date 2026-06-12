@@ -92,6 +92,29 @@ describe('PanelsComponent', () => {
 		expect(fixture.nativeElement.querySelector('.hub-panels__nav--pills')).toBeTruthy();
 	});
 
+	describe('multiple selection (tabs)', () => {
+		beforeEach(() => {
+			host.multiple = true;
+		});
+
+		it('keeps several panes open at once', async () => {
+			await settle(fixture);
+			navLinks()[2].click();
+			await settle(fixture);
+
+			const open = fixture.nativeElement.querySelectorAll('.hub-panels__panel--active');
+			expect(open.length).toBe(2);
+			expect(fixture.nativeElement.querySelector('.hub-panels__content--multiple')).toBeTruthy();
+		});
+
+		it('toggles an open pane closed when its tab is clicked again', async () => {
+			await settle(fixture);
+			navLinks()[0].click();
+			await settle(fixture);
+			expect(navLinks()[0].classList).not.toContain('hub-panels__nav-link--active');
+		});
+	});
+
 	describe('accordion view', () => {
 		beforeEach(() => {
 			host.type = 'accordion';

@@ -21,19 +21,22 @@
 			}
 		</button>
 	</h2>
-	<div
-		class="hub-panels__accordion-collapse"
-		role="region"
-		[class.hub-panels__accordion-collapse--collapsed]="!active()"
-		[id]="id()"
-		[attr.aria-labelledby]="id() + '-link'"
-		[attr.aria-hidden]="!active()"
-		[attr.inert]="active() ? null : ''"
-	>
-		<div class="hub-panels__accordion-body">
-			<ng-content />
-		</div>
-	</div>
-} @else {
-	<ng-content />
 }
+
+<!-- Single projection slot for every view. In the strip views the wrappers are
+	 plain pass-throughs; in the accordion view they become the animated collapse
+	 region. A single <ng-content> avoids the lost-projection bug that two
+	 conditional slots cause. -->
+<div
+	[class.hub-panels__accordion-collapse]="accordionView()"
+	[class.hub-panels__accordion-collapse--collapsed]="accordionView() && !active()"
+	[attr.role]="accordionView() ? 'region' : null"
+	[attr.id]="accordionView() ? id() : null"
+	[attr.aria-labelledby]="accordionView() ? id() + '-link' : null"
+	[attr.aria-hidden]="accordionView() ? !active() : null"
+	[attr.inert]="accordionView() && !active() ? '' : null"
+>
+	<div [class.hub-panels__accordion-body]="accordionView()">
+		<ng-content />
+	</div>
+</div>

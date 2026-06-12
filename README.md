@@ -161,6 +161,25 @@ selected = new FormControl<string>('dark');
 With `multiple`, the form value is an array. Use `bindValue="meta.key"` to map
 each panel's `value` object to a primitive, and `compareWith` for custom equality.
 
+### Multiple selection
+
+Add `multiple` to let several panels be open at once. In the `tabs` / `pills`
+views the open panes render side by side (or stacked, when `vertical`), each at
+least `--hub-panels-pane-min-width` wide; the content area scrolls when they
+overflow. In the `accordion` view every selected panel expands.
+
+```html
+<hub-panels multiple [formControl]="open">
+	<hub-panel heading="Summary" value="summary">…</hub-panel>
+	<hub-panel heading="Stats" value="stats">…</hub-panel>
+	<hub-panel heading="Activity" value="activity">…</hub-panel>
+</hub-panels>
+```
+
+```ts
+open = new FormControl<string[]>(['summary', 'stats']);
+```
+
 ### Routed panels
 
 ```html

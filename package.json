@@ -1,6 +1,6 @@
 {
 	"name": "ng-hub-ui-panels",
-	"version": "21.0.0",
+	"version": "21.1.0",
 	"description": "A versatile, accessible content-panels container for Angular 21 with three visualizations (tabs, pills, accordion), routing, reactive forms and keyboard navigation. Part of the ng-hub-ui family.",
 	"author": "Carlos Morcillo <carlos.morcillo@me.com> (https://www.carlosmorcillo.com)",
 	"repository": {

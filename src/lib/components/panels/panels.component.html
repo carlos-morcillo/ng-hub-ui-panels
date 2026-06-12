@@ -80,6 +80,7 @@
 	class="hub-panels__content"
 	[class.hub-panels__content--pills]="type() === 'pills'"
 	[class.hub-panels__content--accordion]="isAccordionView()"
+	[class.hub-panels__content--multiple]="!isAccordionView() && multiple()"
 >
 	@if (activePanelHasRouter()) {
 		<router-outlet />

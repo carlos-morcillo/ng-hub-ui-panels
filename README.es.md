@@ -161,6 +161,26 @@ selected = new FormControl<string>('dark');
 Con `multiple`, el valor del formulario es un array. Usa `bindValue="meta.key"` para
 mapear el `value` de cada panel a un primitivo, y `compareWith` para igualdad personalizada.
 
+### Selección múltiple
+
+Añade `multiple` para permitir varios paneles abiertos a la vez. En las vistas
+`tabs` / `pills` los panes abiertos se renderizan lado a lado (o apilados, si es
+`vertical`), cada uno con al menos `--hub-panels-pane-min-width` de ancho; el área
+de contenido hace scroll cuando desbordan. En la vista `accordion` se expanden todos
+los paneles seleccionados.
+
+```html
+<hub-panels multiple [formControl]="open">
+	<hub-panel heading="Resumen" value="summary">…</hub-panel>
+	<hub-panel heading="Estadísticas" value="stats">…</hub-panel>
+	<hub-panel heading="Actividad" value="activity">…</hub-panel>
+</hub-panels>
+```
+
+```ts
+open = new FormControl<string[]>(['summary', 'stats']);
+```
+
 ### Paneles enrutados
 
 ```html

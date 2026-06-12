@@ -110,7 +110,7 @@
 
 		&:disabled {
 			color: var(--hub-panels-tab-color-disabled);
-			cursor: default;
+			cursor: not-allowed;
 		}
 	}
 

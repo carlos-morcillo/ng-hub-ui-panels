@@ -80,9 +80,12 @@ import type { PanelComponent } from '../panel/panel.component';
 	],
 	host: {
 		class: 'hub-panels',
-		'[class.hub-panels--vertical]': 'vertical()',
+		'[class.hub-panels--tabs]': "type() === 'tabs'",
+		'[class.hub-panels--pills]': "type() === 'pills'",
+		'[class.hub-panels--vertical]': 'vertical() && !isAccordionView()',
 		'[class.hub-panels--accordion]': 'isAccordionView()',
 		'[class.hub-panels--flush]': 'isAccordionView() && flush()',
+		'[class.hub-panels--multiple]': 'multiple()',
 		'(window:resize)': 'updateScrollButtons()'
 	}
 })
@@ -148,8 +151,13 @@ export class PanelsComponent implements ControlValueAccessor {
 	/** Whether the container renders the accordion visualization. */
 	readonly isAccordionView = computed(() => this.type() === 'accordion');
 
-	/** Whether more than one panel may be active at once. */
-	readonly allowsMultipleActive = computed(() => this.isAccordionView() && this.multiple());
+	/**
+	 * Whether more than one panel may be active at once. Driven solely by
+	 * `multiple`, so it applies to every view: in the accordion view several
+	 * panels stay expanded; in the `tabs` / `pills` views several panes render
+	 * side by side (or stacked, when `vertical`).
+	 */
+	readonly allowsMultipleActive = computed(() => this.multiple());
 
 	/** Whether the bound form control disabled the whole container. */
 	readonly formDisabled = signal(false);
@@ -248,11 +256,27 @@ export class PanelsComponent implements ControlValueAccessor {
 
 	/**
 	 * Activates a panel on behalf of the user (`tabs` / `pills` views): marks it
-	 * active, navigates when routed, and emits `panelChange`. Disabled and
-	 * already-active panels no-op.
+	 * active, navigates when routed, and emits `panelChange`. In `multiple` mode
+	 * clicking an active panel toggles it off (the panes render side by side);
+	 * otherwise an already-active panel no-ops. Disabled panels always no-op.
 	 */
 	selectPanel(panel: PanelComponent): void {
-		if (panel.disabled() || panel.active() || this.formDisabled()) {
+		if (panel.disabled() || this.formDisabled()) {
+			return;
+		}
+		if (this.allowsMultipleActive()) {
+			if (panel.active()) {
+				panel.active.set(false);
+			} else {
+				panel.active.set(true);
+				panel.navigate();
+				this.panelChange.emit({ prev: undefined, current: panel });
+			}
+			this.#emitFormValue();
+			this.#onTouched();
+			return;
+		}
+		if (panel.active()) {
 			return;
 		}
 		const previousPanel = this.activePanel();
