@@ -1,8 +1,9 @@
-@if (!isAccordionView()) {
+@if (!isAccordionView() && !isCardView()) {
 	@if (multiple()) {
 		<div class="hub-panels__multiple-layout">
 			@for (group of multipleHeaderGroups(); track group.activePanel ?? group.headers[0]) {
 				<div
+					#multipleBlock
 					class="hub-panels hub-panels__multiple-block"
 					[class.hub-panels--tabs]="type() === 'tabs'"
 					[class.hub-panels--pills]="type() === 'pills'"

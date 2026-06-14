@@ -1,0 +1,133 @@
+import { Component } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+
+import { PanelFooterDirective } from '../../directives/panel-footer.directive';
+import { PanelHeaderDirective } from '../../directives/panel-header.directive';
+import { PanelComponent } from './panel.component';
+import { PanelsComponent } from '../panels/panels.component';
+
+@Component({
+	standalone: true,
+	imports: [PanelsComponent, PanelComponent, PanelHeaderDirective, PanelFooterDirective],
+	template: `
+		<hub-panels type="card">
+			<hub-panel>
+				<div hubPanelHeader>Header A</div>
+				Body A
+				<div hubPanelFooter>Footer A</div>
+			</hub-panel>
+			<hub-panel>Body B</hub-panel>
+		</hub-panels>
+	`
+})
+class CardContainerHost {}
+
+@Component({
+	standalone: true,
+	imports: [PanelComponent, PanelHeaderDirective, PanelFooterDirective],
+	template: `
+		<hub-panel>
+			<div hubPanelHeader>Standalone header</div>
+			Standalone body
+			<div hubPanelFooter>Standalone footer</div>
+		</hub-panel>
+	`
+})
+class StandaloneHost {}
+
+@Component({
+	standalone: true,
+	imports: [PanelsComponent, PanelComponent, PanelHeaderDirective],
+	template: `
+		<hub-panels type="tabs">
+			<hub-panel heading="A">
+				<div hubPanelHeader>Tab header</div>
+				Body A
+			</hub-panel>
+		</hub-panels>
+	`
+})
+class TabsWithHeaderHost {}
+
+describe('panels card view + content header/footer slots', () => {
+	beforeEach(async () => {
+		await TestBed.configureTestingModule({
+			providers: [provideRouter([])]
+		}).compileComponents();
+	});
+
+	describe('type="card" container', () => {
+		it('renders no navigation strip and flags the card view', () => {
+			const fixture = TestBed.createComponent(CardContainerHost);
+			fixture.detectChanges();
+
+			const root = fixture.nativeElement as HTMLElement;
+			expect(root.querySelector('.hub-panels')?.classList).toContain('hub-panels--card');
+			expect(root.querySelectorAll('.hub-panels__nav-link').length).toBe(0);
+			expect(root.querySelector('.hub-panels__header')).toBeNull();
+		});
+
+		it('marks every panel as a card (all visible, none gated by --active)', () => {
+			const fixture = TestBed.createComponent(CardContainerHost);
+			fixture.detectChanges();
+
+			const panels = fixture.nativeElement.querySelectorAll('.hub-panels__panel');
+			expect(panels.length).toBe(2);
+			for (const panel of panels) {
+				expect(panel.classList).toContain('hub-panels__panel--card');
+			}
+		});
+
+		it('projects header/footer slots with their band classes', () => {
+			const fixture = TestBed.createComponent(CardContainerHost);
+			fixture.detectChanges();
+
+			const root = fixture.nativeElement as HTMLElement;
+			const header = root.querySelector('[hubPanelHeader]');
+			const footer = root.querySelector('[hubPanelFooter]');
+			expect(header?.classList).toContain('hub-panels__panel-header');
+			expect(footer?.classList).toContain('hub-panels__panel-footer');
+			expect(header?.textContent).toContain('Header A');
+			expect(footer?.textContent).toContain('Footer A');
+		});
+	});
+
+	describe('standalone <hub-panel>', () => {
+		it('renders as a card without an owning container and without throwing', () => {
+			const fixture = TestBed.createComponent(StandaloneHost);
+			expect(() => fixture.detectChanges()).not.toThrow();
+
+			const panel = fixture.nativeElement.querySelector('.hub-panels__panel');
+			expect(panel).not.toBeNull();
+			expect(panel.classList).toContain('hub-panels__panel--card');
+			expect(panel.textContent).toContain('Standalone body');
+		});
+
+		it('projects the header/footer slots when used standalone', () => {
+			const fixture = TestBed.createComponent(StandaloneHost);
+			fixture.detectChanges();
+
+			const header = fixture.nativeElement.querySelector('[hubPanelHeader]');
+			const footer = fixture.nativeElement.querySelector('[hubPanelFooter]');
+			expect(header?.classList).toContain('hub-panels__panel-header');
+			expect(footer?.classList).toContain('hub-panels__panel-footer');
+		});
+	});
+
+	describe('shared header slot in the tabs view', () => {
+		it('projects [hubPanelHeader] inside the pane body of a tab panel', () => {
+			const fixture = TestBed.createComponent(TabsWithHeaderHost);
+			fixture.detectChanges();
+
+			// The nav strip still renders the tab label…
+			const root = fixture.nativeElement as HTMLElement;
+			expect(root.querySelector('.hub-panels__nav-link')?.textContent).toContain('A');
+
+			// …and the content header band renders inside the panel body.
+			const header = root.querySelector('.hub-panels__panel [hubPanelHeader]');
+			expect(header?.classList).toContain('hub-panels__panel-header');
+			expect(header?.textContent).toContain('Tab header');
+		});
+	});
+});

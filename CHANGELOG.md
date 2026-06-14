@@ -5,6 +5,14 @@ All notable changes to the ng-hub-ui-panels library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [21.2.0] - 2026-06-14
+
+### Added
+- New `card` visualization (`type="card"`): a chromeless format with no navigation strip where every `<hub-panel>` is always visible and rendered as a card. Ideal for a single standalone panel or a stack of cards.
+- A `<hub-panel>` can now be used **standalone**, outside any `<hub-panels>` container, in which case it renders as a card on its own (the container injection is optional and the card styles ship with the panel component).
+- New content-slot directives `hubPanelHeader` and `hubPanelFooter`: mark an element inside a `<hub-panel>` as the panel's header/footer band. They render in **every** view (`tabs`, `pills`, `accordion`, `card`), distinct from `hubPanelHeading` (the navigational tab/accordion label).
+- New tokens: `--hub-panels-card-bg`, `--hub-panels-card-color`, `--hub-panels-card-border-width`, `--hub-panels-card-border-color`, `--hub-panels-card-border-radius`, `--hub-panels-card-box-shadow`, `--hub-panels-card-padding-x`, `--hub-panels-card-padding-y`, `--hub-panels-card-gap`, and the `--hub-panels-panel-header-*` family for the header/footer bands.
+
 ## [21.1.1] - 2026-06-12
 
 ### Added
@@ -17,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - In `multiple` tabs/pills, every active header now starts its own visible block, each block keeps the same tabs/pills chrome as a regular panel set, and the layout scrolls horizontally when the blocks exceed the available width.
 - In `multiple` tabs/pills, every visible block now stretches its content area to the full available height, matching the single-panel layouts.
 - In `multiple` vertical tabs/pills, each visible block now uses the same side-by-side header/content orientation as the regular vertical layouts.
+- In `multiple` vertical tabs/pills, the grouped blocks now stack top-to-bottom, and each panel area keeps at least the larger of its content-driven width and its associated header-stack height.
+- In `multiple` vertical tabs/pills, each stacked row now stretches across the full available width again; the content-driven/header-driven minimum width applies only to the panel area.
+- In regrouped `multiple` vertical tabs/pills, active panes are now re-placed in a second post-render pass so late-rendered blocks no longer end up with empty content areas.
+- In `pills` + `multiple` + `vertical`, stacked blocks now draw a divider line between rows so panel boundaries remain visible even with borderless content areas.
 - `--hub-panels-pane-gap` now defaults to `0`.
 
 ## [21.1.0] - 2026-06-11

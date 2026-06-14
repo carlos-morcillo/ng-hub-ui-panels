@@ -12,6 +12,7 @@ Use these variables to customize the visual appearance without editing component
 - [Tab Headers](#tab-headers)
 - [Pills](#pills)
 - [Accordion View](#accordion-view)
+- [Card & Content Slots](#card--content-slots)
 - [Customization Examples](#customization-examples)
 - [Best Practices](#best-practices)
 
@@ -137,6 +138,34 @@ Each token falls back to the matching `--hub-accordion-*` variable.
 | `--hub-panels-accordion-collapse-transition-easing` | `cubic-bezier(0.4, 0, 0.2, 1)` |
 | `--hub-panels-accordion-body-padding-x` | `1.25rem` |
 | `--hub-panels-accordion-body-padding-y` | `1rem` |
+
+---
+
+## Card & Content Slots
+
+Used by the `card` view (`type="card"`) and by the `hubPanelHeader` /
+`hubPanelFooter` content bands (which render in every view). The card tokens are
+declared on `:where(.hub-panels__panel--card)` so a **standalone** `<hub-panel>`
+is themable too — target `hub-panel { … }` when there is no `.hub-panels` ancestor.
+
+| Variable | Default |
+| --- | --- |
+| `--hub-panels-card-bg` | `#fff` |
+| `--hub-panels-card-color` | `#212529` |
+| `--hub-panels-card-border-width` | `1px` |
+| `--hub-panels-card-border-color` | `#dee2e6` |
+| `--hub-panels-card-border-radius` | `0.375rem` |
+| `--hub-panels-card-box-shadow` | `0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)` |
+| `--hub-panels-card-padding-x` | `1.25rem` |
+| `--hub-panels-card-padding-y` | `1rem` |
+| `--hub-panels-card-gap` | `1rem` (between cards in the container) |
+| `--hub-panels-panel-header-bg` | `#f8f9fa` |
+| `--hub-panels-panel-header-color` | `#212529` |
+| `--hub-panels-panel-header-padding-x` | `1.25rem` |
+| `--hub-panels-panel-header-padding-y` | `1rem` |
+| `--hub-panels-panel-header-font-weight` | `600` |
+| `--hub-panels-panel-header-border-width` | `1px` |
+| `--hub-panels-panel-header-border-color` | `#dee2e6` |
 
 ---
 

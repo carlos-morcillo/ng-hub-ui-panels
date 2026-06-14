@@ -5,7 +5,7 @@
 			class="hub-panels__accordion-btn"
 			[class.hub-panels__accordion-btn--collapsed]="!active()"
 			[id]="id() + '-link'"
-			[disabled]="disabled() || tabset.formDisabled()"
+			[disabled]="disabled() || tabset?.formDisabled()"
 			[attr.aria-expanded]="active()"
 			[attr.aria-controls]="id()"
 			(click)="onAccordionHeaderClick()"
@@ -23,10 +23,12 @@
 	</h2>
 }
 
-<!-- Single projection slot for every view. In the strip views the wrappers are
-	 plain pass-throughs; in the accordion view they become the animated collapse
-	 region. A single <ng-content> avoids the lost-projection bug that two
-	 conditional slots cause. -->
+<!-- Projection slots for every view. In the strip views the wrappers are plain
+	 pass-throughs; in the accordion view they become the animated collapse
+	 region. The header/footer `select` slots and the default `<ng-content>` are
+	 all UNCONDITIONAL — never wrapped in `@if` — to avoid the lost-projection
+	 bug that conditional slots cause. Header/footer render in every view; the
+	 `card` view styles them as the card's header and footer bands. -->
 <div
 	[class.hub-panels__accordion-collapse]="accordionView()"
 	[class.hub-panels__accordion-collapse--collapsed]="accordionView() && !active()"
@@ -37,6 +39,10 @@
 	[attr.inert]="accordionView() && !active() ? '' : null"
 >
 	<div [class.hub-panels__accordion-body]="accordionView()">
-		<ng-content />
+		<ng-content select="[hubPanelHeader]" />
+		<div class="hub-panels__panel-body">
+			<ng-content />
+		</div>
+		<ng-content select="[hubPanelFooter]" />
 	</div>
 </div>

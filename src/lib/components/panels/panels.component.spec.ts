@@ -121,7 +121,7 @@ describe('PanelsComponent', () => {
 
 			expect(multipleBlocks().length).toBe(2);
 			expect(headerGroups()[0].textContent?.replace(/\s+/g, ' ').trim()).toBe('One Two');
-			expect(headerGroups()[1].textContent?.replace(/\s+/g, ' ').trim()).toBe('Three');
+			expect(headerGroups()[1].textContent?.replace(/\s+/g, ' ').trim()).toBe('Three ×');
 		});
 
 		it('includes leading inactive tabs in the first active block', async () => {
@@ -130,7 +130,7 @@ describe('PanelsComponent', () => {
 			await settle(fixture);
 
 			expect(multipleBlocks().length).toBe(1);
-			expect(headerGroups()[0].textContent?.replace(/\s+/g, ' ').trim()).toBe('One Two Three');
+			expect(headerGroups()[0].textContent?.replace(/\s+/g, ' ').trim()).toBe('One Two Three ×');
 			expect(navLinks()[1].classList).toContain('hub-panels__nav-link--active');
 			expect(navLinks()[0].classList).not.toContain('hub-panels__nav-link--active');
 		});
@@ -145,7 +145,7 @@ describe('PanelsComponent', () => {
 			await settle(fixture);
 
 			expect(multipleBlocks().length).toBe(1);
-			expect(headerGroups()[0].textContent?.replace(/\s+/g, ' ').trim()).toBe('One Two Three');
+			expect(headerGroups()[0].textContent?.replace(/\s+/g, ' ').trim()).toBe('One Two Three ×');
 			expect(navLinks()[2].classList).not.toContain('hub-panels__nav-link--active');
 		});
 
@@ -156,7 +156,7 @@ describe('PanelsComponent', () => {
 			await settle(fixture);
 
 			const firstBlock = multipleBlocks()[0];
-			expect(getComputedStyle(firstBlock).minWidth).toBe('256px');
+			expect(getComputedStyle(firstBlock).minWidth).toBe('var(--hub-panels-pane-min-width)');
 		});
 	});
 
@@ -185,6 +185,7 @@ describe('PanelsComponent', () => {
 		it('opens a single panel at a time by default', async () => {
 			await settle(fixture);
 			accordionButtons()[0].click();
+			await settle(fixture);
 			accordionButtons()[2].click();
 			await settle(fixture);
 

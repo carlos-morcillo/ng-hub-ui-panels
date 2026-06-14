@@ -13,7 +13,8 @@ import {
 	output,
 	Renderer2,
 	signal,
-	TemplateRef
+	TemplateRef,
+	ViewEncapsulation
 } from '@angular/core';
 import { Params, Router } from '@angular/router';
 
@@ -52,14 +53,22 @@ let nextPanelId = 0;
 	exportAs: 'hubPanel',
 	imports: [NgTemplateOutlet],
 	templateUrl: './panel.component.html',
+	// The `card` view styles (and the projected header/footer bands) live here so
+	// a standalone `<hub-panel>` — used outside any `<hub-panels>` container, which
+	// would otherwise be the only source of the global styles — is styled too.
+	// `ViewEncapsulation.None` is required so the rules reach the projected,
+	// consumer-owned `[hubPanelHeader]` / `[hubPanelFooter]` elements.
+	styleUrl: './panel.component.scss',
+	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	host: {
 		class: 'hub-panels__panel',
-		'[attr.id]': 'accordionView() ? null : id()',
-		'[attr.role]': "accordionView() ? null : 'tabpanel'",
-		'[attr.aria-labelledby]': "accordionView() ? null : id() + '-link'",
+		'[attr.id]': 'accordionView() || cardView() ? null : id()',
+		'[attr.role]': "accordionView() || cardView() ? null : 'tabpanel'",
+		'[attr.aria-labelledby]': "accordionView() || cardView() ? null : id() + '-link'",
 		'[class.hub-panels__panel--active]': 'active()',
-		'[class.hub-panels__panel--accordion]': 'accordionView()'
+		'[class.hub-panels__panel--accordion]': 'accordionView()',
+		'[class.hub-panels__panel--card]': 'cardView()'
 	}
 })
 export class PanelComponent implements OnDestroy {
@@ -69,8 +78,12 @@ export class PanelComponent implements OnDestroy {
 	readonly #renderer = inject(Renderer2);
 	readonly #router = inject(Router);
 
-	/** Owning panels container. Exposed to the template for the accordion header. */
-	protected readonly tabset = inject(PanelsComponent);
+	/**
+	 * Owning panels container, or `null` when the panel is used standalone
+	 * (outside any `<hub-panels>`), in which case it renders as a card.
+	 * Exposed to the template for the accordion header.
+	 */
+	protected readonly tabset = inject(PanelsComponent, { optional: true });
 
 	/** Plain-text panel header. Ignored when a `hubPanelHeading` template exists. */
 	readonly heading = input<string | undefined>(undefined);
@@ -124,7 +137,13 @@ export class PanelComponent implements OnDestroy {
 	readonly headingRef = signal<TemplateRef<unknown> | undefined>(undefined);
 
 	/** Whether the owning container renders the accordion visualization. */
-	protected readonly accordionView = computed(() => this.tabset.isAccordionView());
+	protected readonly accordionView = computed(() => this.tabset?.isAccordionView() ?? false);
+
+	/**
+	 * Whether this panel renders as a card: either inside a `<hub-panels
+	 * type="card">` container or standalone (no owning container at all).
+	 */
+	protected readonly cardView = computed(() => !this.tabset || this.tabset.isCardView());
 
 	/** Form value resolved for this panel: the explicit `value` or the panel id. */
 	readonly formValue = computed(() => (this.value() !== undefined ? this.value() : this.id()));
@@ -142,7 +161,8 @@ export class PanelComponent implements OnDestroy {
 	#wasActive = false;
 
 	constructor() {
-		this.tabset.registerPanel(this);
+		// Standalone panels (no container) render as a card and skip registration.
+		this.tabset?.registerPanel(this);
 
 		// Mirror `customClass` onto the pane host element.
 		effect((onCleanup) => {
@@ -174,7 +194,7 @@ export class PanelComponent implements OnDestroy {
 			this.#wasActive = isActive;
 			if (isActive) {
 				this.selectPanel.emit(this);
-				if (!this.tabset.allowsMultipleActive()) {
+				if (this.tabset && !this.tabset.allowsMultipleActive()) {
 					for (const panel of this.tabset.panels()) {
 						if (panel !== this) {
 							panel.active.set(false);
@@ -188,7 +208,7 @@ export class PanelComponent implements OnDestroy {
 	}
 
 	ngOnDestroy(): void {
-		this.tabset.removePanel(this, { reselect: false, emit: false });
+		this.tabset?.removePanel(this, { reselect: false, emit: false });
 	}
 
 	/** Route path plus query string, or `null` when the panel is not routed. */
@@ -238,16 +258,16 @@ export class PanelComponent implements OnDestroy {
 
 	/** Accordion header click — toggles this panel through the container. */
 	protected onAccordionHeaderClick(): void {
-		this.tabset.togglePanel(this);
+		this.tabset?.togglePanel(this);
 	}
 
 	/** Accordion header keyboard navigation, delegated to the container. */
 	protected onAccordionHeaderKeydown(event: KeyboardEvent): void {
-		this.tabset.onAccordionKeydown(event, this);
+		this.tabset?.onAccordionKeydown(event, this);
 	}
 
 	/** Removes this panel through the accordion header's ✕ affordance. */
 	protected removeSelf(): void {
-		this.tabset.removePanel(this);
+		this.tabset?.removePanel(this);
 	}
 }

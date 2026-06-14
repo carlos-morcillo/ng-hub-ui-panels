@@ -229,6 +229,9 @@
 
 		&.hub-panels--vertical {
 			flex-direction: row;
+			flex: 1 1 auto;
+			width: 100%;
+			min-width: 100%;
 			min-height: var(--hub-panels-pane-min-height);
 		}
 
@@ -236,6 +239,15 @@
 			display: flex;
 			flex: 1 1 auto;
 			min-height: 0;
+		}
+
+		&.hub-panels--vertical > .hub-panels__content {
+			flex: 1 1 auto;
+			width: auto;
+			min-width: max(
+				var(--hub-panels-pane-min-width),
+				var(--hub-panels-multiple-vertical-panel-min-width, 0px)
+			);
 		}
 	}
 
@@ -259,6 +271,21 @@
 		> .hub-panels__panel.hub-panels__panel--active > div {
 			flex: 1 1 auto;
 			min-height: 0;
+		}
+	}
+
+	&--vertical.hub-panels--multiple {
+		> .hub-panels__multiple-layout {
+			flex-direction: column;
+			align-items: stretch;
+			width: 100%;
+		}
+	}
+
+	&--pills.hub-panels--multiple.hub-panels--vertical {
+		> .hub-panels__multiple-layout > .hub-panels__multiple-block + .hub-panels__multiple-block {
+			padding-top: var(--hub-panels-nav-content-gap);
+			border-top: var(--hub-panels-border-width) solid var(--hub-panels-border-color);
 		}
 	}
 
@@ -403,6 +430,23 @@
 		> .hub-panels__header {
 			margin-bottom: 0;
 			margin-inline-end: var(--hub-panels-nav-content-gap);
+		}
+	}
+
+	// ── Card view ────────────────────────────────────────────────────────
+	// No navigation strip: the content area becomes a bare vertical stack of
+	// cards (each `<hub-panel>` styles itself via panel.component.scss).
+	&--card {
+		display: flex;
+
+		> .hub-panels__content {
+			display: flex;
+			flex-direction: column;
+			gap: var(--hub-panels-card-gap, var(--hub-ref-space-3, 1rem));
+			width: 100%;
+			padding: 0;
+			background: transparent;
+			box-shadow: none;
 		}
 	}
 

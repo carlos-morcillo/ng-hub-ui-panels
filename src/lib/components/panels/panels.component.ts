@@ -12,6 +12,7 @@ import {
 	input,
 	output,
 	Renderer2,
+	RendererStyleFlags2,
 	signal,
 	viewChild,
 	viewChildren,
@@ -88,11 +89,12 @@ interface MultipleHeaderGroup {
 		class: 'hub-panels',
 		'[class.hub-panels--tabs]': "type() === 'tabs'",
 		'[class.hub-panels--pills]': "type() === 'pills'",
-		'[class.hub-panels--vertical]': 'vertical() && !isAccordionView()',
+		'[class.hub-panels--card]': 'isCardView()',
+		'[class.hub-panels--vertical]': 'vertical() && !isAccordionView() && !isCardView()',
 		'[class.hub-panels--accordion]': 'isAccordionView()',
 		'[class.hub-panels--flush]': 'isAccordionView() && flush()',
 		'[class.hub-panels--multiple]': 'multiple()',
-		'(window:resize)': 'updateScrollButtons()'
+		'(window:resize)': 'onWindowResize()'
 	}
 })
 export class PanelsComponent implements ControlValueAccessor {
@@ -118,6 +120,9 @@ export class PanelsComponent implements ControlValueAccessor {
 
 	/** Visible block hosts used by `multiple` tabs / pills. */
 	readonly multiplePaneHosts = viewChildren<ElementRef<HTMLElement>>('multiplePaneHost');
+
+	/** Visible grouped blocks used by `multiple` tabs / pills. */
+	readonly multipleBlocks = viewChildren<ElementRef<HTMLElement>>('multipleBlock');
 
 	/** Emitted when the user activates (opens) a different panel. */
 	readonly panelChange = output<PanelChangeEvent>();
@@ -167,12 +172,17 @@ export class PanelsComponent implements ControlValueAccessor {
 	readonly isAccordionView = computed(() => this.type() === 'accordion');
 
 	/**
-	 * Whether more than one panel may be active at once. Driven solely by
-	 * `multiple`, so it applies to every view: in the accordion view several
-	 * panels stay expanded; in the `tabs` / `pills` views several panes render
-	 * side by side (or stacked, when `vertical`).
+	 * Whether the container renders the chromeless `card` visualization: no
+	 * navigation strip and every panel always visible, each styled as a card.
 	 */
-	readonly allowsMultipleActive = computed(() => this.multiple());
+	readonly isCardView = computed(() => this.type() === 'card');
+
+	/**
+	 * Whether more than one panel may be active at once. Driven by `multiple`
+	 * for every view, and always enabled in the `card` view, where all panels
+	 * stay visible at once and must not deactivate one another.
+	 */
+	readonly allowsMultipleActive = computed(() => this.multiple() || this.isCardView());
 
 	/** Whether the bound form control disabled the whole container. */
 	readonly formDisabled = signal(false);
@@ -224,6 +234,7 @@ export class PanelsComponent implements ControlValueAccessor {
 	#syncScheduled = false;
 	#viewInitialised = false;
 	#placementScheduled = false;
+	#multipleBlockSizingScheduled = false;
 
 	/** Last value written by the bound form control; `null` when no form. */
 	#formValue: unknown[] | null = null;
@@ -244,6 +255,7 @@ export class PanelsComponent implements ControlValueAccessor {
 			this.#applyFormValue();
 			this.#ensureActivePanel();
 			this.#schedulePanelPlacement();
+			this.#scheduleMultipleBlockSizing();
 			this.#router.events
 				.pipe(
 					filter((event) => event instanceof NavigationEnd),
@@ -327,6 +339,13 @@ export class PanelsComponent implements ControlValueAccessor {
 			return;
 		}
 		const previousPanel = this.activePanel();
+		// Deactivate the previously active panel up front so the emitted form
+		// value reflects only the newly selected panel. The per-panel effect that
+		// enforces single-active runs asynchronously, so relying on it here would
+		// emit a stale value that still includes the previous panel.
+		if (previousPanel && previousPanel !== panel) {
+			previousPanel.active.set(false);
+		}
 		panel.active.set(true);
 		panel.navigate();
 		this.panelChange.emit({ prev: previousPanel, current: panel });
@@ -512,6 +531,12 @@ export class PanelsComponent implements ControlValueAccessor {
 		this.forwardIsDisabled.set(scrollLeft + contentBoxWidth(scroller) + 1 >= scrollWidth);
 	}
 
+	/** Re-syncs scroll controls and multiple-block sizing on window resize. */
+	protected onWindowResize(): void {
+		this.updateScrollButtons();
+		this.#scheduleMultipleBlockSizing();
+	}
+
 	/** Updates the scroll buttons as the strip scrolls. */
 	protected onScroll(): void {
 		this.updateScrollButtons();
@@ -610,7 +635,7 @@ export class PanelsComponent implements ControlValueAccessor {
 			}
 			this.#applyFormValue();
 			this.#ensureActivePanel();
-			this.#placeProjectedPanels();
+			this.#schedulePanelPlacement();
 			this.updateScrollButtons();
 		});
 	}
@@ -621,12 +646,39 @@ export class PanelsComponent implements ControlValueAccessor {
 			return;
 		}
 		this.#placementScheduled = true;
-		queueMicrotask(() => {
+		requestAnimationFrame(() => {
 			this.#placementScheduled = false;
 			if (this.#isDestroyed || !this.#viewInitialised) {
 				return;
 			}
-			this.#placeProjectedPanels();
+			this.#runPanelPlacementPass();
+			requestAnimationFrame(() => {
+				if (this.#isDestroyed || !this.#viewInitialised) {
+					return;
+				}
+				this.#runPanelPlacementPass();
+			});
+		});
+	}
+
+	/** Performs one projected-panel placement pass plus dependent sizing. */
+	#runPanelPlacementPass(): void {
+		this.#placeProjectedPanels();
+		this.#scheduleMultipleBlockSizing();
+	}
+
+	/** Coalesces the DOM measurements needed by `multiple + vertical`. */
+	#scheduleMultipleBlockSizing(): void {
+		if (this.#multipleBlockSizingScheduled || this.#isDestroyed) {
+			return;
+		}
+		this.#multipleBlockSizingScheduled = true;
+		requestAnimationFrame(() => {
+			this.#multipleBlockSizingScheduled = false;
+			if (this.#isDestroyed || !this.#viewInitialised) {
+				return;
+			}
+			this.#syncMultipleBlockSizing();
 		});
 	}
 
@@ -646,8 +698,11 @@ export class PanelsComponent implements ControlValueAccessor {
 			return;
 		}
 		const hostMap = new Map(
-			this.multiplePaneHosts()
-				.map((host) => host.nativeElement)
+			Array.from(
+				this.#elementRef.nativeElement.querySelectorAll<HTMLElement>(
+					'.hub-panels__multiple-layout .hub-panels__multiple-pane-host'
+				)
+			)
 				.map((host) => [host.dataset['panelId'] ?? '', host] as const)
 		);
 		for (const panel of this.panels()) {
@@ -656,6 +711,32 @@ export class PanelsComponent implements ControlValueAccessor {
 			if (panelElement.parentElement !== targetHost) {
 				this.#renderer.appendChild(targetHost, panelElement);
 			}
+		}
+	}
+
+	/** Updates the minimum content width for each `multiple + vertical` block. */
+	#syncMultipleBlockSizing(): void {
+		for (const blockRef of this.multipleBlocks()) {
+			const block = blockRef.nativeElement;
+			this.#renderer.removeStyle(
+				block,
+				'--hub-panels-multiple-vertical-panel-min-width',
+				RendererStyleFlags2.DashCase
+			);
+			if (!this.vertical() || !this.allowsMultipleActive() || this.isAccordionView()) {
+				continue;
+			}
+			const header = block.querySelector(':scope > .hub-panels__header');
+			if (!(header instanceof HTMLElement)) {
+				continue;
+			}
+			const headerStackHeight = Math.ceil(header.getBoundingClientRect().height);
+			this.#renderer.setStyle(
+				block,
+				'--hub-panels-multiple-vertical-panel-min-width',
+				`${headerStackHeight}px`,
+				RendererStyleFlags2.DashCase
+			);
 		}
 	}
 

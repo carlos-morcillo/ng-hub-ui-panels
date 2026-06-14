@@ -3,9 +3,9 @@
 **Español** | [English](./README.md)
 
 Un contenedor de **paneles de contenido** versátil y accesible para Angular que se
-renderiza como **tabs**, **pills** o **accordion** desde una sola API — con routing,
-formularios reactivos, navegación por teclado y theming con variables CSS. Construido
-como componentes standalone de Angular sobre Signals.
+renderiza como **tabs**, **pills**, **accordion** o simples **cards** desde una sola
+API — con routing, formularios reactivos, navegación por teclado y theming con
+variables CSS. Construido como componentes standalone de Angular sobre Signals.
 
 > `ng-hub-ui-panels` sustituye a [`ng-hub-ui-accordion`](https://www.npmjs.com/package/ng-hub-ui-accordion). Su vista accordion es un reemplazo directo y más capaz.
 
@@ -53,7 +53,13 @@ npm install ng-hub-ui-panels
 Los componentes son standalone — impórtalos directamente donde los uses:
 
 ```ts
-import { PanelsComponent, PanelComponent, PanelHeadingDirective } from 'ng-hub-ui-panels';
+import {
+	PanelsComponent,
+	PanelComponent,
+	PanelHeadingDirective,
+	PanelHeaderDirective,
+	PanelFooterDirective
+} from 'ng-hub-ui-panels';
 ```
 
 ### 3. Usar
@@ -70,15 +76,20 @@ import { PanelsComponent, PanelComponent, PanelHeadingDirective } from 'ng-hub-u
 
 ## 📦 Descripción
 
-`ng-hub-ui-panels` unifica los tres patrones de conmutación de contenido más
-habituales — **tabs**, **pills** y **accordion** — tras un único componente
-declarativo. Coloca paneles `<hub-panel>` dentro de `<hub-panels>` y elige un
-`type`; todo lo demás (navegación por teclado, semántica ARIA, colapso animado,
-paneles enrutados y binding de formularios) funciona igual en las tres vistas.
+`ng-hub-ui-panels` unifica los patrones de conmutación de contenido más
+habituales — **tabs**, **pills** y **accordion** — más un layout **card** sin
+cromo, tras un único componente declarativo. Coloca paneles `<hub-panel>` dentro
+de `<hub-panels>` y elige un `type`; todo lo demás (navegación por teclado,
+semántica ARIA, colapso animado, paneles enrutados y binding de formularios)
+funciona igual en todas las vistas. Un `<hub-panel>` también puede usarse de forma
+**standalone**, fuera de cualquier contenedor, donde se renderiza como una card por
+sí mismo.
 
 ## 🎯 Características
 
-- **Tres visualizaciones** — `tabs`, `pills` y `accordion`, con un único input `type`.
+- **Cuatro visualizaciones** — `tabs`, `pills`, `accordion` y `card`, con un único input `type`.
+- **Layout card y standalone** — `type="card"` renderiza cada panel como una card siempre visible; un único `<hub-panel>` también funciona por sí solo, fuera de cualquier contenedor.
+- **Slots de cabecera/pie de contenido** — `hubPanelHeader` y `hubPanelFooter` marcan bandas de cabecera/pie que se renderizan en todas las vistas (distintas de la etiqueta de navegación `hubPanelHeading`).
 - **Formularios** — implementa `ControlValueAccessor`; vincula el/los panel(es) activo(s) a un `FormControl` o `ngModel` (simple o `multiple`), con `bindValue` y `compareWith`.
 - **Routing** — un panel con `routerLink` convierte el área de contenido en un `<router-outlet>` que sigue la URL.
 - **Teclado y accesibilidad** — tabindex móvil, teclas Flecha/Home/End/Delete y roles `role="tablist"`/`tab`/`tabpanel` y semántica `aria-expanded`/`aria-controls` para accordion.
@@ -134,6 +145,43 @@ npm install ng-hub-ui-panels
 	<hub-panel heading="Devoluciones">…</hub-panel>
 </hub-panels>
 ```
+
+### Cards
+
+`type="card"` elimina por completo la tira de navegación: cada panel está siempre
+visible y se renderiza como una card. Usa los slots `hubPanelHeader` /
+`hubPanelFooter` para las bandas de cabecera y pie de la card.
+
+```html
+<hub-panels type="card">
+	<hub-panel>
+		<div hubPanelHeader>Resumen del proyecto</div>
+		Cada panel está siempre visible y estilizado como una card.
+		<div hubPanelFooter>Actualizado hace 2 horas</div>
+	</hub-panel>
+	<hub-panel>
+		<div hubPanelHeader>Equipo</div>
+		Los mismos slots de cabecera/pie funcionan también en tabs, pills y accordion.
+	</hub-panel>
+</hub-panels>
+```
+
+Un único `<hub-panel>` puede usarse por sí solo, sin contenedor — se renderiza como
+una card por sí mismo:
+
+```html
+<hub-panel>
+	<div hubPanelHeader>Card standalone</div>
+	Por sí solo, un hub-panel se renderiza como una card.
+	<div hubPanelFooter>
+		<button class="btn btn-sm btn-primary">Acción</button>
+	</div>
+</hub-panel>
+```
+
+> `hubPanelHeader` / `hubPanelFooter` son bandas de contenido dentro del cuerpo del
+> panel y se renderizan en **todas** las vistas. Son distintas de `hubPanelHeading`,
+> que es la etiqueta de navegación (tab) o el botón de disclosure del accordion.
 
 ### Vertical / Justified / Scrollable
 
@@ -212,7 +260,7 @@ Cuando el panel activo está enrutado, el área de contenido renderiza un
 
 | Input | Tipo | Por defecto | Descripción |
 | --- | --- | --- | --- |
-| `type` | `'tabs' \| 'pills' \| 'accordion'` | `'tabs'` | Visualización del contenedor. |
+| `type` | `'tabs' \| 'pills' \| 'accordion' \| 'card'` | `'tabs'` | Visualización del contenedor. `card` elimina la tira y muestra cada panel como una card. |
 | `vertical` | `boolean` | `false` | Apila la tira junto al contenido (tabs / pills). |
 | `justified` | `boolean` | `false` | Estira las cabeceras a igual ancho. |
 | `scrollable` | `boolean` | `false` | Añade botones de scroll cuando la tira desborda. |
@@ -251,9 +299,11 @@ Cuando el panel activo está enrutado, el área de contenido renderiza un
 | `deselectPanel` | `PanelComponent` | Se emite cuando el panel deja de estar activo. |
 | `removed` | `PanelComponent` | Se emite al eliminarlo (✕ o Delete). |
 
-### Directiva
+### Directivas
 
-- `hubPanelHeading` — marca un `<ng-template>` dentro de un `hub-panel` como su cabecera personalizada.
+- `hubPanelHeading` — marca un `<ng-template>` dentro de un `hub-panel` como su cabecera **de navegación** (enlace de tab/pill o botón de disclosure del accordion).
+- `hubPanelHeader` — marca un elemento dentro de un `hub-panel` como la banda de **cabecera** de contenido, renderizada en la parte superior del cuerpo del panel en todas las vistas.
+- `hubPanelFooter` — marca un elemento dentro de un `hub-panel` como la banda de **pie** de contenido, renderizada en la parte inferior del cuerpo del panel en todas las vistas.
 
 ### Configuración
 
@@ -274,6 +324,18 @@ Todo se tematiza con variables CSS `--hub-panels-*`. Consulta
 hub-panels {
 	--hub-panels-tab-color-active: #198754;
 	--hub-panels-pill-bg-active: #198754;
+}
+```
+
+La vista `card` y las bandas de cabecera/pie tienen sus propios tokens
+(`--hub-panels-card-*`, `--hub-panels-card-gap`, `--hub-panels-panel-header-*`).
+Como un `<hub-panel>` standalone no tiene un ancestro `.hub-panels`, tematiza el
+propio panel al estilizar cards independientes:
+
+```css
+hub-panel {
+	--hub-panels-card-border-radius: 0.75rem;
+	--hub-panels-panel-header-bg: #eef2ff;
 }
 ```
 

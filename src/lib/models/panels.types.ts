@@ -2,9 +2,10 @@ import type { PanelComponent } from '../components/panel/panel.component';
 
 /**
  * Visualization of the panels container: classic underlined/boxed `tabs`,
- * rounded `pills`, or stacked disclosure panels (`accordion`).
+ * rounded `pills`, stacked disclosure panels (`accordion`), or chromeless
+ * always-visible cards (`card`) with no navigation strip.
  */
-export type PanelsType = 'tabs' | 'pills' | 'accordion';
+export type PanelsType = 'tabs' | 'pills' | 'accordion' | 'card';
 
 /**
  * Event emitted by {@link PanelsComponent.panelChange} when the user
