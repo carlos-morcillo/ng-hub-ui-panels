@@ -28,12 +28,16 @@ Esta biblioteca forma parte del ecosistema **ng-hub-ui**:
 - [**ng-hub-ui-breadcrumbs**](https://www.npmjs.com/package/ng-hub-ui-breadcrumbs)
 - [**ng-hub-ui-calendar**](https://www.npmjs.com/package/ng-hub-ui-calendar)
 - [**ng-hub-ui-dropdown**](https://www.npmjs.com/package/ng-hub-ui-dropdown)
+- [**ng-hub-ui-ds**](https://www.npmjs.com/package/ng-hub-ui-ds)
+- [**ng-hub-ui-forms**](https://www.npmjs.com/package/ng-hub-ui-forms)
 - [**ng-hub-ui-history**](https://www.npmjs.com/package/ng-hub-ui-history)
+- [**ng-hub-ui-milestones**](https://www.npmjs.com/package/ng-hub-ui-milestones)
 - [**ng-hub-ui-modal**](https://www.npmjs.com/package/ng-hub-ui-modal)
 - [**ng-hub-ui-nav**](https://www.npmjs.com/package/ng-hub-ui-nav)
 - [**ng-hub-ui-paginable**](https://www.npmjs.com/package/ng-hub-ui-paginable)
 - [**ng-hub-ui-panels**](https://www.npmjs.com/package/ng-hub-ui-panels) ← Estás aquí
 - [**ng-hub-ui-portal**](https://www.npmjs.com/package/ng-hub-ui-portal)
+- [**ng-hub-ui-skeleton**](https://www.npmjs.com/package/ng-hub-ui-skeleton)
 - [**ng-hub-ui-sortable**](https://www.npmjs.com/package/ng-hub-ui-sortable)
 - [**ng-hub-ui-stepper**](https://www.npmjs.com/package/ng-hub-ui-stepper)
 - [**ng-hub-ui-utils**](https://www.npmjs.com/package/ng-hub-ui-utils)
@@ -47,6 +51,21 @@ Esta biblioteca forma parte del ecosistema **ng-hub-ui**:
 ```bash
 npm install ng-hub-ui-panels
 ```
+
+> **Tematización (recomendado):** instala los tokens compartidos una vez para que
+> panels —y cualquier otra librería de ng-hub-ui— lea la misma paleta y el modo
+> oscuro:
+>
+> ```bash
+> npm install ng-hub-ui-ds
+> ```
+> ```css
+> @import 'ng-hub-ui-ds/styles/tokens/hub-tokens.css';
+> ```
+>
+> Es una peer dependency **opcional**: panels trae fallbacks sensatos y funciona
+> sin ella, pero los tokens dan colores consistentes y tematizables en toda la
+> familia (y alimentan las variantes del alert).
 
 ### 2. Importar
 
@@ -182,6 +201,42 @@ una card por sí mismo:
 > `hubPanelHeader` / `hubPanelFooter` son bandas de contenido dentro del cuerpo del
 > panel y se renderizan en **todas** las vistas. Son distintas de `hubPanelHeading`,
 > que es la etiqueta de navegación (tab) o el botón de disclosure del accordion.
+
+### Alertas
+
+Un `<hub-panel>` independiente se convierte en una **alerta** semántica con
+`appearance="alert"` y un `variant`. Cada variante mapea a la familia de tokens
+`--hub-sys-color-<variant>-*` del design system —sin un set de variables por
+color— así que la alerta hereda cada tema y el modo oscuro automáticamente.
+
+```html
+<hub-panel appearance="alert" variant="success">Tus cambios se han guardado.</hub-panel>
+<hub-panel appearance="alert" variant="danger">Algo ha ido mal.</hub-panel>
+<hub-panel appearance="alert" variant="warning">Tu prueba termina en 3 días.</hub-panel>
+<hub-panel appearance="alert" variant="info">Hay una nueva versión disponible.</hub-panel>
+
+<!-- Omite el variant para una alerta neutra -->
+<hub-panel appearance="alert">Un aviso neutro.</hub-panel>
+
+<!-- Las alertas admiten los mismos slots de cabecera/pie que las cards -->
+<hub-panel appearance="alert" variant="danger">
+	<div hubPanelHeader>Pago fallido</div>
+	Actualiza tus datos de facturación para mantener activa tu suscripción.
+	<div hubPanelFooter><button class="btn btn-sm btn-danger">Actualizar facturación</button></div>
+</hub-panel>
+```
+
+> `variant` acepta los integrados `primary | success | danger | warning | info`
+> (con los tintes exactos del design system) **o cualquier string personalizado**:
+> la alerta lee `--hub-sys-color-<variant>` de tu app y deriva su aspecto con
+> `color-mix`, así que tu propia paleta de acento funciona sin tocar nada aquí.
+>
+> ```html
+> <!-- con `:root { --hub-sys-color-brand: #9333ea; }` definido en tu app -->
+> <hub-panel appearance="alert" variant="brand">Aviso de marca</hub-panel>
+> ```
+>
+> La apariencia de alerta se ignora en las vistas de strip `tabs` / `pills` / `accordion`.
 
 ### Vertical / Justified / Scrollable
 
@@ -377,4 +432,4 @@ Consulta [CHANGELOG.md](./CHANGELOG.md).
 
 ## 📄 Licencia
 
-MIT © Carlos Morcillo
+MIT © [Carlos Morcillo](https://www.carlosmorcillo.com)

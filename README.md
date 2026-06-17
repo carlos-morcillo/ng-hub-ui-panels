@@ -28,12 +28,16 @@ This library is part of the **ng-hub-ui** ecosystem:
 - [**ng-hub-ui-breadcrumbs**](https://www.npmjs.com/package/ng-hub-ui-breadcrumbs)
 - [**ng-hub-ui-calendar**](https://www.npmjs.com/package/ng-hub-ui-calendar)
 - [**ng-hub-ui-dropdown**](https://www.npmjs.com/package/ng-hub-ui-dropdown)
+- [**ng-hub-ui-ds**](https://www.npmjs.com/package/ng-hub-ui-ds)
+- [**ng-hub-ui-forms**](https://www.npmjs.com/package/ng-hub-ui-forms)
 - [**ng-hub-ui-history**](https://www.npmjs.com/package/ng-hub-ui-history)
+- [**ng-hub-ui-milestones**](https://www.npmjs.com/package/ng-hub-ui-milestones)
 - [**ng-hub-ui-modal**](https://www.npmjs.com/package/ng-hub-ui-modal)
 - [**ng-hub-ui-nav**](https://www.npmjs.com/package/ng-hub-ui-nav)
 - [**ng-hub-ui-paginable**](https://www.npmjs.com/package/ng-hub-ui-paginable)
 - [**ng-hub-ui-panels**](https://www.npmjs.com/package/ng-hub-ui-panels) ← You are here
 - [**ng-hub-ui-portal**](https://www.npmjs.com/package/ng-hub-ui-portal)
+- [**ng-hub-ui-skeleton**](https://www.npmjs.com/package/ng-hub-ui-skeleton)
 - [**ng-hub-ui-sortable**](https://www.npmjs.com/package/ng-hub-ui-sortable)
 - [**ng-hub-ui-stepper**](https://www.npmjs.com/package/ng-hub-ui-stepper)
 - [**ng-hub-ui-utils**](https://www.npmjs.com/package/ng-hub-ui-utils)
@@ -47,6 +51,20 @@ This library is part of the **ng-hub-ui** ecosystem:
 ```bash
 npm install ng-hub-ui-panels
 ```
+
+> **Theming (recommended):** install the shared design tokens once so panels —
+> and every other ng-hub-ui library — reads the same palette and dark mode:
+>
+> ```bash
+> npm install ng-hub-ui-ds
+> ```
+> ```css
+> @import 'ng-hub-ui-ds/styles/tokens/hub-tokens.css';
+> ```
+>
+> It is an **optional** peer dependency: panels ships sensible fallbacks and
+> works without it, but the tokens give consistent, themeable colours across the
+> whole family (and power the alert variants).
 
 ### 2. Import
 
@@ -89,6 +107,7 @@ its own.
 - **Four visualizations** — `tabs`, `pills`, `accordion` and `card`, switched with a single `type` input.
 - **Card layout & standalone** — `type="card"` renders every panel as an always-visible card; a single `<hub-panel>` also works on its own, outside any container.
 - **Content header/footer slots** — `hubPanelHeader` and `hubPanelFooter` mark header/footer bands that render in every view (distinct from the `hubPanelHeading` nav label).
+- **Semantic alerts** — `appearance="alert"` with a `variant` turns a panel into a themed callout (`role="alert"`) driven by the design-system semantic tokens, no per-colour CSS.
 - **Forms** — implements `ControlValueAccessor`; bind the active panel(s) to a `FormControl` or `ngModel` (single or `multiple`), with `bindValue` and `compareWith`.
 - **Routing** — a panel with a `routerLink` turns the content area into a `<router-outlet>` that follows the URL.
 - **Keyboard & a11y** — roving tabindex, Arrow/Home/End/Delete keys, and correct `role="tablist"`/`tab`/`tabpanel` and accordion `aria-expanded`/`aria-controls` semantics.
@@ -181,6 +200,42 @@ card by itself:
 > `hubPanelHeader` / `hubPanelFooter` are content bands inside the panel body and
 > render in **every** view. They are different from `hubPanelHeading`, which is the
 > navigational tab label / accordion disclosure button.
+
+### Alerts
+
+A standalone `<hub-panel>` becomes a semantic **alert** with
+`appearance="alert"` and a `variant`. Each variant maps to the design-system
+`--hub-sys-color-<variant>-*` token family — there is no per-colour token set —
+so the alert inherits every theme and dark mode automatically.
+
+```html
+<hub-panel appearance="alert" variant="success">Your changes were saved.</hub-panel>
+<hub-panel appearance="alert" variant="danger">Something went wrong.</hub-panel>
+<hub-panel appearance="alert" variant="warning">Your trial ends in 3 days.</hub-panel>
+<hub-panel appearance="alert" variant="info">A new version is available.</hub-panel>
+
+<!-- Omit the variant for a neutral alert -->
+<hub-panel appearance="alert">A neutral notice.</hub-panel>
+
+<!-- Alerts support the same header/footer slots as cards -->
+<hub-panel appearance="alert" variant="danger">
+	<div hubPanelHeader>Payment failed</div>
+	Update your billing details to keep your subscription active.
+	<div hubPanelFooter><button class="btn btn-sm btn-danger">Update billing</button></div>
+</hub-panel>
+```
+
+> `variant` accepts the built-in `primary | success | danger | warning | info`
+> (rendered with the exact design-system tints) **or any custom string**: the
+> alert reads `--hub-sys-color-<variant>` from your app and derives its look with
+> `color-mix`, so your own accent palette works with no changes here.
+>
+> ```html
+> <!-- with `:root { --hub-sys-color-brand: #9333ea; }` defined in your app -->
+> <hub-panel appearance="alert" variant="brand">On-brand callout</hub-panel>
+> ```
+>
+> The alert appearance is ignored in the `tabs` / `pills` / `accordion` strip views.
 
 ### Vertical / Justified / Scrollable
 
@@ -375,4 +430,4 @@ See [CHANGELOG.md](./CHANGELOG.md).
 
 ## 📄 License
 
-MIT © Carlos Morcillo
+MIT © [Carlos Morcillo](https://www.carlosmorcillo.com)

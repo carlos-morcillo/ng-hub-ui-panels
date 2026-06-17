@@ -50,6 +50,34 @@ class StandaloneHost {}
 })
 class TabsWithHeaderHost {}
 
+@Component({
+	standalone: true,
+	imports: [PanelComponent],
+	template: `
+		<hub-panel appearance="alert" variant="success">Saved successfully</hub-panel>
+		<hub-panel appearance="alert">Neutral notice</hub-panel>
+	`
+})
+class AlertHost {}
+
+@Component({
+	standalone: true,
+	imports: [PanelsComponent, PanelComponent],
+	template: `
+		<hub-panels type="tabs">
+			<hub-panel heading="A" appearance="alert" variant="danger">Body A</hub-panel>
+		</hub-panels>
+	`
+})
+class AlertInTabsHost {}
+
+@Component({
+	standalone: true,
+	imports: [PanelComponent],
+	template: `<hub-panel appearance="alert" variant="brand">Custom accent</hub-panel>`
+})
+class CustomVariantAlertHost {}
+
 describe('panels card view + content header/footer slots', () => {
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
@@ -112,6 +140,57 @@ describe('panels card view + content header/footer slots', () => {
 			const footer = fixture.nativeElement.querySelector('[hubPanelFooter]');
 			expect(header?.classList).toContain('hub-panels__panel-header');
 			expect(footer?.classList).toContain('hub-panels__panel-footer');
+		});
+	});
+
+	describe('alert appearance', () => {
+		it('renders a semantic alert with the variant data-attribute and role', () => {
+			const fixture = TestBed.createComponent(AlertHost);
+			fixture.detectChanges();
+
+			const panels = fixture.nativeElement.querySelectorAll('.hub-panels__panel');
+			const success = panels[0] as HTMLElement;
+			expect(success.classList).toContain('hub-panels__panel--alert');
+			expect(success.classList).not.toContain('hub-panels__panel--card');
+			expect(success.getAttribute('data-variant')).toBe('success');
+			expect(success.getAttribute('role')).toBe('alert');
+			expect(success.textContent).toContain('Saved successfully');
+		});
+
+		it('omits data-variant for a neutral alert (no variant)', () => {
+			const fixture = TestBed.createComponent(AlertHost);
+			fixture.detectChanges();
+
+			const neutral = fixture.nativeElement.querySelectorAll('.hub-panels__panel')[1] as HTMLElement;
+			expect(neutral.classList).toContain('hub-panels__panel--alert');
+			expect(neutral.getAttribute('data-variant')).toBeNull();
+		});
+
+		it('feeds the accent inline from the variant name (success)', () => {
+			const fixture = TestBed.createComponent(AlertHost);
+			fixture.detectChanges();
+
+			const success = fixture.nativeElement.querySelector('.hub-panels__panel--alert[data-variant=success]') as HTMLElement;
+			expect(success.style.getPropertyValue('--hub-panels-alert-accent')).toBe('var(--hub-sys-color-success)');
+		});
+
+		it('supports an arbitrary custom variant (open accent palette)', () => {
+			const fixture = TestBed.createComponent(CustomVariantAlertHost);
+			fixture.detectChanges();
+
+			const el = fixture.nativeElement.querySelector('.hub-panels__panel--alert') as HTMLElement;
+			expect(el.getAttribute('data-variant')).toBe('brand');
+			expect(el.style.getPropertyValue('--hub-panels-alert-accent')).toBe('var(--hub-sys-color-brand)');
+		});
+
+		it('ignores the alert appearance inside a strip view (tabs)', () => {
+			const fixture = TestBed.createComponent(AlertInTabsHost);
+			fixture.detectChanges();
+
+			const panel = fixture.nativeElement.querySelector('.hub-panels__panel') as HTMLElement;
+			expect(panel.classList).not.toContain('hub-panels__panel--alert');
+			expect(panel.getAttribute('data-variant')).toBeNull();
+			expect(panel.getAttribute('role')).toBe('tabpanel');
 		});
 	});
 

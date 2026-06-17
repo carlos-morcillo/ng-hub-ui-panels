@@ -18,6 +18,7 @@ import {
 } from '@angular/core';
 import { Params, Router } from '@angular/router';
 
+import { HubPanelAppearance, HubPanelVariant } from '../../models/panels.types';
 import { PanelsComponent } from '../panels/panels.component';
 
 /** Monotonic counter backing the auto-generated accessibility ids. */
@@ -64,11 +65,14 @@ let nextPanelId = 0;
 	host: {
 		class: 'hub-panels__panel',
 		'[attr.id]': 'accordionView() || cardView() ? null : id()',
-		'[attr.role]': "accordionView() || cardView() ? null : 'tabpanel'",
+		'[attr.role]': "alertView() ? 'alert' : (accordionView() || cardView() ? null : 'tabpanel')",
 		'[attr.aria-labelledby]': "accordionView() || cardView() ? null : id() + '-link'",
+		'[attr.data-variant]': 'alertView() ? (variant() ?? null) : null',
+		'[style.--hub-panels-alert-accent]': 'alertAccent()',
 		'[class.hub-panels__panel--active]': 'active()',
 		'[class.hub-panels__panel--accordion]': 'accordionView()',
-		'[class.hub-panels__panel--card]': 'cardView()'
+		'[class.hub-panels__panel--card]': 'cardView() && !alertView()',
+		'[class.hub-panels__panel--alert]': 'alertView()'
 	}
 })
 export class PanelComponent implements OnDestroy {
@@ -87,6 +91,24 @@ export class PanelComponent implements OnDestroy {
 
 	/** Plain-text panel header. Ignored when a `hubPanelHeading` template exists. */
 	readonly heading = input<string | undefined>(undefined);
+
+	/**
+	 * Visual appearance of a standalone panel: a plain `card` (default) or a
+	 * semantic `alert` callout. Only meaningful when the panel renders as a
+	 * card (used standalone or inside a `card` container); ignored in the
+	 * tabs / pills / accordion strip views.
+	 */
+	readonly appearance = input<HubPanelAppearance>('card');
+
+	/**
+	 * Semantic colour applied when `appearance` is `alert`. The built-in values
+	 * (`primary` / `success` / `danger` / `warning` / `info`) render with the
+	 * design-system tints. Any other string is also accepted: the alert reads
+	 * `--hub-sys-color-<variant>` from the host application, so a custom accent
+	 * palette interconnects with no changes to this library. Omit for a neutral
+	 * alert.
+	 */
+	readonly variant = input<HubPanelVariant | (string & {}) | undefined>(undefined);
 
 	/**
 	 * Unique id used for the `tab` / `tabpanel` (or accordion header / region)
@@ -144,6 +166,24 @@ export class PanelComponent implements OnDestroy {
 	 * type="card">` container or standalone (no owning container at all).
 	 */
 	protected readonly cardView = computed(() => !this.tabset || this.tabset.isCardView());
+
+	/**
+	 * Whether this panel renders as a semantic alert: `appearance="alert"` while
+	 * in a card-capable context (standalone or inside a `card` container). In the
+	 * strip / accordion views the alert appearance is ignored.
+	 */
+	protected readonly alertView = computed(() => this.appearance() === 'alert' && this.cardView());
+
+	/**
+	 * Inline accent fed to the alert styles: `var(--hub-sys-color-<variant>)` for
+	 * the active variant, or `null` for a neutral alert / non-alert view. This is
+	 * what makes the variant set open — any accent token defined by the host
+	 * application is picked up without the library knowing the variant name.
+	 */
+	protected readonly alertAccent = computed(() => {
+		const variant = this.variant();
+		return this.alertView() && variant ? `var(--hub-sys-color-${variant})` : null;
+	});
 
 	/** Form value resolved for this panel: the explicit `value` or the panel id. */
 	readonly formValue = computed(() => (this.value() !== undefined ? this.value() : this.id()));
