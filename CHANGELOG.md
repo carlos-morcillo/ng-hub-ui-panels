@@ -5,6 +5,22 @@ All notable changes to the ng-hub-ui-panels library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [22.0.0] - 2026-06-17
+
+### Changed
+
+- Aligned with Angular 22.
+- README documentation standardized.
+
+
+## [21.3.0] - 2026-06-16
+
+### Added
+- New `alert` appearance for a standalone `<hub-panel>`: `<hub-panel appearance="alert" [variant]="…">` renders the panel as a semantic callout (subtle background, subtle border, an accent stripe and emphasis text) with `role="alert"`. Works standalone or inside a `type="card"` container; ignored in the `tabs` / `pills` / `accordion` strip views.
+- New `variant` input on `<hub-panel>` selecting the alert's semantic colour; omit it for a neutral alert. Exported types `HubPanelAppearance` and `HubPanelVariant`. The built-in variants (`primary` / `success` / `danger` / `warning` / `info`) render with the exact design-system tints; **any other string is also accepted** — the alert reads `--hub-sys-color-<variant>` from the host application and derives its look with `color-mix`, so a custom accent palette interconnects with no changes to the library.
+- New tokens for the alert: `--hub-panels-alert-bg`, `--hub-panels-alert-color`, `--hub-panels-alert-border-color`, `--hub-panels-alert-accent`, `--hub-panels-alert-padding-x`, `--hub-panels-alert-padding-y`, `--hub-panels-alert-border-radius`, `--hub-panels-alert-accent-width`. The per-variant colours are not new token sets — each variant re-points the generic alert tokens at the design-system `--hub-sys-color-<variant>-{subtle,border-subtle,emphasis}` family, so the alert inherits every theme and dark mode automatically.
+- `ng-hub-ui-ds` added as an **optional** peer dependency: install it once to give panels (and the rest of the family) the shared `--hub-*` token palette and dark mode. Panels keeps working without it via built-in fallbacks.
+
 ## [21.2.0] - 2026-06-14
 
 ### Added
