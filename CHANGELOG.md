@@ -5,6 +5,12 @@ All notable changes to the ng-hub-ui-panels library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- The outer container chrome now inherits from the `--hub-container-*` base layer (re-base hook): `--hub-panels-content-bg`, `--hub-panels-border-color`, `--hub-panels-border-width`, `--hub-panels-border-radius` and `--hub-panels-content-padding-x/y` default through `var(--hub-container-*, <previous default>)`. Overriding a container token on a subtree now re-bases the panels chrome. No visual change with default tokens.
+
 ## [22.0.0] - 2026-06-17
 
 ### Changed

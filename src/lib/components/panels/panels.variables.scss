@@ -14,16 +14,18 @@
 // ─────────────────────────────────────────────────────────────────────────
 
 :where(.hub-panels) {
-	// Strip + content
+	// Strip + content — outer container chrome inherits from the
+	// `--hub-container-*` base layer (re-basable per subtree), each
+	// keeping its own value as the final fallback.
 	--hub-panels-flex-direction: row;
-	--hub-panels-border-width: var(--hub-ref-border-width, 1px);
-	--hub-panels-border-color: var(--hub-sys-border-color-default, #dee2e6);
-	--hub-panels-border-radius: var(--hub-ref-radius-md, 0.375rem);
-	--hub-panels-content-bg: var(--hub-sys-surface-page, #fff);
+	--hub-panels-border-width: var(--hub-container-border-width, var(--hub-ref-border-width, 1px));
+	--hub-panels-border-color: var(--hub-container-border-color, var(--hub-sys-border-color-default, #dee2e6));
+	--hub-panels-border-radius: var(--hub-container-border-radius, var(--hub-ref-radius-md, 0.375rem));
+	--hub-panels-content-bg: var(--hub-container-bg, var(--hub-sys-surface-page, #fff));
 	--hub-panels-header-bg: var(--hub-panels-content-bg);
 	--hub-panels-content-box-shadow: none;
-	--hub-panels-content-padding-x: var(--hub-ref-space-3, 1rem);
-	--hub-panels-content-padding-y: var(--hub-ref-space-3, 1rem);
+	--hub-panels-content-padding-x: var(--hub-container-padding-x, var(--hub-ref-space-3, 1rem));
+	--hub-panels-content-padding-y: var(--hub-container-padding-y, var(--hub-ref-space-3, 1rem));
 	--hub-panels-nav-btn-width: 1.5rem;
 	--hub-panels-nav-btn-height: 1.5rem;
 	--hub-panels-backward-btn-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23212529' d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3E%3C/svg%3E");
