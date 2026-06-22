@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [22.1.0] - 2026-06-22
+
+### Added
+
+- New `variant` input on `<hub-panels>` selecting the **semantic accent of the navigation strip**: `<hub-panels variant="success">` recolours the active/hover tab, the active pill and the active accordion header. The built-in variants (`primary` / `success` / `danger` / `warning` / `info`) render with the exact design-system tints; **any other string is also accepted** — the strip reads `--hub-sys-color-<variant>` from the host application and derives the hover/active roles with `color-mix`, so a custom accent palette interconnects with no changes to the library. Defaults to `primary` when omitted. Mirrors the open-set accent system already used by `<hub-panel appearance="alert">`.
+- New tokens for the group accent: `--hub-panels-accent`, `--hub-panels-accent-emphasis`, `--hub-panels-accent-subtle`. The strip's active/hover affordances (`--hub-panels-nav-link-active-color`, `--hub-panels-nav-link-hover-color`, `--hub-panels-tab-border-color-active`, `--hub-panels-pill-bg-active`, `--hub-panels-accordion-active-color`, `--hub-panels-accordion-active-bg`) now resolve through this single accent instead of being hard-wired to `--hub-sys-color-primary*`. No visual change with the default `primary` accent.
+
 ### Changed
 
 - The outer container chrome now inherits from the `--hub-container-*` base layer (re-base hook): `--hub-panels-content-bg`, `--hub-panels-border-color`, `--hub-panels-border-width`, `--hub-panels-border-radius` and `--hub-panels-content-padding-x/y` default through `var(--hub-container-*, <previous default>)`. Overriding a container token on a subtree now re-bases the panels chrome. No visual change with default tokens.

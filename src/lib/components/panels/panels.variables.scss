@@ -14,6 +14,17 @@
 // ─────────────────────────────────────────────────────────────────────────
 
 :where(.hub-panels) {
+	// Group accent — the single semantic colour that drives every coloured
+	// affordance of the navigation strip (active/hover tab, active pill, active
+	// accordion header). It defaults to the `primary` family and is re-based per
+	// `variant` further down, exactly like the `<hub-panel appearance="alert">`
+	// accent: change one accent and the whole strip recolours. The derived roles
+	// (`-emphasis` / `-subtle`) follow the design-system tints for the built-in
+	// variants and degrade to `color-mix` for any custom accent.
+	--hub-panels-accent: var(--hub-sys-color-primary, #0d6efd);
+	--hub-panels-accent-emphasis: var(--hub-sys-color-primary-emphasis, #0a58ca);
+	--hub-panels-accent-subtle: var(--hub-sys-color-primary-subtle, #e7f1ff);
+
 	// Strip + content — outer container chrome inherits from the
 	// `--hub-container-*` base layer (re-basable per subtree), each
 	// keeping its own value as the final fallback.
@@ -33,8 +44,8 @@
 	--hub-panels-nav-link-padding-x: var(--hub-ref-space-3, 1rem);
 	--hub-panels-nav-link-padding-y: var(--hub-ref-space-2, 0.5rem);
 	--hub-panels-nav-link-color: var(--hub-sys-text-primary, #212529);
-	--hub-panels-nav-link-hover-color: var(--hub-sys-color-primary-emphasis, #0a58ca);
-	--hub-panels-nav-link-active-color: var(--hub-sys-color-primary, #0d6efd);
+	--hub-panels-nav-link-hover-color: var(--hub-panels-accent-emphasis);
+	--hub-panels-nav-link-active-color: var(--hub-panels-accent);
 	--hub-panels-nav-link-active-bg: var(--hub-panels-content-bg);
 	--hub-panels-nav-link-disabled-color: var(--hub-sys-text-muted, #6c757d);
 
@@ -56,7 +67,7 @@
 	--hub-panels-tab-color-hover: var(--hub-panels-nav-link-hover-color);
 	--hub-panels-tab-bg-active: var(--hub-panels-nav-link-active-bg);
 	--hub-panels-tab-color-active: var(--hub-panels-nav-link-active-color);
-	--hub-panels-tab-border-color-active: var(--hub-sys-color-primary, #0d6efd);
+	--hub-panels-tab-border-color-active: var(--hub-panels-accent);
 	--hub-panels-tab-bg-disabled: transparent;
 	--hub-panels-tab-color-disabled: var(--hub-panels-nav-link-disabled-color);
 	--hub-panels-tab-focus-ring-width: var(--hub-sys-focus-ring-width, 0.25rem);
@@ -73,7 +84,7 @@
 	// Strip layout extras
 	--hub-panels-nav-gap: 0;
 	--hub-panels-pill-border-radius: 50rem;
-	--hub-panels-pill-bg-active: var(--hub-sys-color-primary, #0d6efd);
+	--hub-panels-pill-bg-active: var(--hub-panels-accent);
 	--hub-panels-pill-color-active: var(--hub-ref-color-white, #fff);
 	--hub-panels-pill-gap: var(--hub-ref-space-2, 0.5rem);
 	--hub-panels-pill-content-border-width: 0;
@@ -108,8 +119,8 @@
 	--hub-panels-accordion-btn-padding-y: var(--hub-accordion-btn-padding-y, var(--hub-ref-space-3, 1rem));
 	--hub-panels-accordion-btn-color: var(--hub-accordion-btn-color, var(--hub-sys-text-primary, #212529));
 	--hub-panels-accordion-btn-bg: var(--hub-accordion-btn-bg, var(--hub-sys-surface-page, #fff));
-	--hub-panels-accordion-active-color: var(--hub-accordion-active-color, var(--hub-sys-color-primary, #0c63e4));
-	--hub-panels-accordion-active-bg: var(--hub-accordion-active-bg, var(--hub-sys-color-primary-subtle, #e7f1ff));
+	--hub-panels-accordion-active-color: var(--hub-accordion-active-color, var(--hub-panels-accent-emphasis));
+	--hub-panels-accordion-active-bg: var(--hub-accordion-active-bg, var(--hub-panels-accent-subtle));
 	--hub-panels-accordion-icon-color: var(--hub-accordion-icon-color, var(--hub-panels-accordion-btn-color));
 	--hub-panels-accordion-icon-active-color: var(--hub-accordion-icon-active-color, var(--hub-panels-accordion-active-color));
 	--hub-panels-accordion-btn-icon-mask: var(--hub-accordion-btn-icon-mask, url("data:image/svg+xml;charset=UTF-8,%3Csvg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E"));
@@ -135,4 +146,38 @@
 	);
 	--hub-panels-accordion-body-padding-x: var(--hub-accordion-body-padding-x, 1.25rem);
 	--hub-panels-accordion-body-padding-y: var(--hub-accordion-body-padding-y, var(--hub-ref-space-3, 1rem));
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Group variant — `<hub-panels [variant]="…">` semantic accent
+// ─────────────────────────────────────────────────────────────────────────
+//
+// The container owns NO colour values: it re-bases the single
+// `--hub-panels-accent` (and its derived `-emphasis` / `-subtle` roles) per
+// variant, and every coloured affordance of the strip follows. Same open-set
+// philosophy as the `alert` panel — the component sets `--hub-panels-accent` to
+// `var(--hub-sys-color-<variant>)` inline, so ANY accent the host app defines
+// works through `color-mix`, while the built-in variants additionally pick up
+// the exact `ng-hub-ui-ds` tints. `:where()` keeps zero specificity so theme
+// rules still win.
+
+// Open default — any variant the host application defines. The derived roles
+// are mixed from the single inline accent so a custom palette interconnects
+// with zero per-colour CSS here.
+:where(.hub-panels[data-variant]) {
+	--hub-panels-accent-emphasis: color-mix(in srgb, var(--hub-panels-accent) 80%, var(--hub-sys-color-ink, #212529));
+	--hub-panels-accent-subtle: color-mix(in srgb, var(--hub-panels-accent) 12%, var(--hub-sys-surface-page, #fff));
+}
+
+// Built-in semantic variants — exact, accessibility-tuned design-system tints.
+// NO colour values live here, only the variant names and the token contract.
+// Must follow the open default so the precise tints win over the generic mix.
+$hub-panels-variants: primary, success, danger, warning, info;
+
+@each $variant in $hub-panels-variants {
+	:where(.hub-panels[data-variant='#{$variant}']) {
+		--hub-panels-accent: var(--hub-sys-color-#{$variant});
+		--hub-panels-accent-emphasis: var(--hub-sys-color-#{$variant}-emphasis);
+		--hub-panels-accent-subtle: var(--hub-sys-color-#{$variant}-subtle);
+	}
 }

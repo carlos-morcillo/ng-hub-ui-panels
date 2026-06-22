@@ -23,7 +23,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 
-import type { PanelChangeEvent, PanelsType } from '../../models/panels.types';
+import type { HubPanelVariant, PanelChangeEvent, PanelsType } from '../../models/panels.types';
 import { PanelsConfig } from '../../services/panels-config.service';
 import { contentBoxWidth } from '../../utils/content-box-width';
 import { readByPath } from '../../utils/read-by-path';
@@ -94,6 +94,8 @@ interface MultipleHeaderGroup {
 		'[class.hub-panels--accordion]': 'isAccordionView()',
 		'[class.hub-panels--flush]': 'isAccordionView() && flush()',
 		'[class.hub-panels--multiple]': 'multiple()',
+		'[attr.data-variant]': 'variant() ?? null',
+		'[style.--hub-panels-accent]': 'groupAccent()',
 		'(window:resize)': 'onWindowResize()'
 	}
 })
@@ -151,6 +153,17 @@ export class PanelsComponent implements ControlValueAccessor {
 	readonly flush = input(false, { transform: booleanAttribute });
 
 	/**
+	 * Semantic accent applied to the navigation strip — the active/hover tab, the
+	 * active pill and the active accordion header all follow it. The built-in
+	 * values (`primary` / `success` / `danger` / `warning` / `info`) render with
+	 * the design-system tints; any other string is also accepted, since the strip
+	 * reads `--hub-sys-color-<variant>` from the host application, so a custom
+	 * accent palette interconnects with no changes to this library. Defaults to
+	 * `primary` when omitted.
+	 */
+	readonly variant = input<HubPanelVariant | (string & {}) | undefined>(undefined);
+
+	/**
 	 * Dot-notation path applied to each panel's `value` to obtain the emitted
 	 * form value (e.g. `'meta.key'`). Empty by default — the raw value is used.
 	 */
@@ -176,6 +189,17 @@ export class PanelsComponent implements ControlValueAccessor {
 	 * navigation strip and every panel always visible, each styled as a card.
 	 */
 	readonly isCardView = computed(() => this.type() === 'card');
+
+	/**
+	 * Inline accent fed to the strip styles: `var(--hub-sys-color-<variant>)` for
+	 * the active variant, or `null` to keep the `primary` default. This is what
+	 * makes the variant set open — any accent token defined by the host
+	 * application is picked up without the library knowing the variant name.
+	 */
+	protected readonly groupAccent = computed(() => {
+		const variant = this.variant();
+		return variant ? `var(--hub-sys-color-${variant})` : null;
+	});
 
 	/**
 	 * Whether more than one panel may be active at once. Driven by `multiple`

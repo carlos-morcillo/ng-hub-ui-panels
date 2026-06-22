@@ -111,6 +111,7 @@ sí mismo.
 - **Slots de cabecera/pie de contenido** — `hubPanelHeader` y `hubPanelFooter` marcan bandas de cabecera/pie que se renderizan en todas las vistas (distintas de la etiqueta de navegación `hubPanelHeading`).
 - **Formularios** — implementa `ControlValueAccessor`; vincula el/los panel(es) activo(s) a un `FormControl` o `ngModel` (simple o `multiple`), con `bindValue` y `compareWith`.
 - **Routing** — un panel con `routerLink` convierte el área de contenido en un `<router-outlet>` que sigue la URL.
+- **Acento de la tira** — `<hub-panels variant>` recolorea la tira de navegación (tab activa/hover, pill activa, cabecera de accordion activa) desde un único acento semántico; las variantes integradas usan los tintes exactos del design system y cualquier acento personalizado se aplica automáticamente.
 - **Teclado y accesibilidad** — tabindex móvil, teclas Flecha/Home/End/Delete y roles `role="tablist"`/`tab`/`tabpanel` y semántica `aria-expanded`/`aria-controls` para accordion.
 - **Layout de la tira** — tiras de cabeceras `vertical`, `justified` y `scrollable`.
 - **Opciones de accordion** — expansión `multiple` y layout `flush` a sangre, con colapso animado basado en grid.
@@ -237,6 +238,26 @@ color— así que la alerta hereda cada tema y el modo oscuro automáticamente.
 > ```
 >
 > La apariencia de alerta se ignora en las vistas de strip `tabs` / `pills` / `accordion`.
+
+### Acento de la tira (`variant`)
+
+Pasa un `variant` a `<hub-panels>` para fijar el **acento semántico de la tira de
+navegación**: la tab activa/hover, la pill activa y la cabecera de accordion
+activa lo siguen. Re-basa un único `--hub-panels-accent` (con los roles derivados
+`-emphasis` / `-subtle`), así que cambiar un solo acento recolorea toda la tira.
+
+```html
+<hub-panels variant="success"> … </hub-panels>
+<hub-panels type="pills" variant="danger"> … </hub-panels>
+<hub-panels type="accordion" variant="info"> … </hub-panels>
+```
+
+> `variant` acepta los integrados `primary | success | danger | warning | info`
+> (con los tintes exactos del design system) **o cualquier string personalizado**:
+> la tira lee `--hub-sys-color-<variant>` de tu app y deriva los roles hover/active
+> con `color-mix`, así que tu propia paleta de acento funciona sin tocar nada aquí.
+> Por defecto es `primary` si se omite. Mismo patrón abierto que el acento de
+> `<hub-panel appearance="alert">`.
 
 ### Vertical / Justified / Scrollable
 

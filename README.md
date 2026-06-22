@@ -108,6 +108,7 @@ its own.
 - **Card layout & standalone** — `type="card"` renders every panel as an always-visible card; a single `<hub-panel>` also works on its own, outside any container.
 - **Content header/footer slots** — `hubPanelHeader` and `hubPanelFooter` mark header/footer bands that render in every view (distinct from the `hubPanelHeading` nav label).
 - **Semantic alerts** — `appearance="alert"` with a `variant` turns a panel into a themed callout (`role="alert"`) driven by the design-system semantic tokens, no per-colour CSS.
+- **Strip accent** — `<hub-panels variant>` recolours the navigation strip (active/hover tab, active pill, active accordion header) from a single semantic accent; built-in variants use the exact design-system tints and any custom accent is picked up automatically.
 - **Forms** — implements `ControlValueAccessor`; bind the active panel(s) to a `FormControl` or `ngModel` (single or `multiple`), with `bindValue` and `compareWith`.
 - **Routing** — a panel with a `routerLink` turns the content area into a `<router-outlet>` that follows the URL.
 - **Keyboard & a11y** — roving tabindex, Arrow/Home/End/Delete keys, and correct `role="tablist"`/`tab`/`tabpanel` and accordion `aria-expanded`/`aria-controls` semantics.
@@ -236,6 +237,26 @@ so the alert inherits every theme and dark mode automatically.
 > ```
 >
 > The alert appearance is ignored in the `tabs` / `pills` / `accordion` strip views.
+
+### Strip accent (`variant`)
+
+Give `<hub-panels>` a `variant` to set the **semantic accent of the navigation
+strip** — the active/hover tab, the active pill and the active accordion header
+all follow it. It re-bases a single `--hub-panels-accent` (with derived
+`-emphasis` / `-subtle` roles), so changing one accent recolours the whole strip.
+
+```html
+<hub-panels variant="success"> … </hub-panels>
+<hub-panels type="pills" variant="danger"> … </hub-panels>
+<hub-panels type="accordion" variant="info"> … </hub-panels>
+```
+
+> `variant` accepts the built-in `primary | success | danger | warning | info`
+> (rendered with the exact design-system tints) **or any custom string**: the
+> strip reads `--hub-sys-color-<variant>` from your app and derives the
+> hover/active roles with `color-mix`, so your own accent palette works with no
+> changes here. Defaults to `primary` when omitted. Same open-set pattern as the
+> `<hub-panel appearance="alert">` accent.
 
 ### Vertical / Justified / Scrollable
 
