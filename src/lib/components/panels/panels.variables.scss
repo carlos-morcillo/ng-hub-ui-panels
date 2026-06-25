@@ -52,7 +52,7 @@
 	// Individual header (chained to the layout tokens above)
 	--hub-panels-tab-font-family: var(--hub-container-font-family, var(--hub-ref-font-family-base));
 	--hub-panels-tab-font-size: var(--hub-container-font-size, var(--hub-ref-font-size-base, 1rem));
-	--hub-panels-tab-font-weight: 500;
+	--hub-panels-tab-font-weight: var(--hub-ref-font-weight-medium, 500);
 	--hub-panels-tab-line-height: var(--hub-ref-line-height-base, 1.5);
 	--hub-panels-tab-padding-x: var(--hub-panels-nav-link-padding-x);
 	--hub-panels-tab-padding-y: var(--hub-panels-nav-link-padding-y);
@@ -83,7 +83,7 @@
 
 	// Strip layout extras
 	--hub-panels-nav-gap: 0;
-	--hub-panels-pill-border-radius: 50rem;
+	--hub-panels-pill-border-radius: var(--hub-ref-radius-pill, 50rem);
 	--hub-panels-pill-bg-active: var(--hub-panels-accent);
 	--hub-panels-pill-color-active: var(--hub-ref-color-white, #fff);
 	--hub-panels-pill-gap: var(--hub-ref-space-2, 0.5rem);
