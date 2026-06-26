@@ -5,7 +5,19 @@ All notable changes to the ng-hub-ui-panels library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [22.2.0] - 2026-06-26
+
+### Added
+
+- **Open-set accent variants.** Both `<hub-panels variant="…">` (navigation strip) and `<hub-panel appearance="alert" variant="…">` now ship the full open accent set as built-ins — `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `neutral`, `light`, `dark` (previously only the first five chromatic ones picked up exact tints). Any other variant keeps working at runtime with no recompile: define a single `--hub-sys-color-<name>` and `variant="<name>"` derives its roles from the open-set `[data-variant]` default.
+- New derived role `--hub-panels-accent-on` — the contrast colour for text sitting on the accent (a grayscale flip driven by the accent's lightness). The active pill text (`--hub-panels-pill-color-active`) now resolves through it instead of a hardcoded white, so a light custom accent stays legible.
+- **Alert content flex tokens.** The `appearance="alert"` body is now a flex container whose layout is tokenised: `--hub-panels-alert-content-direction` (default `row`), `--hub-panels-alert-content-align` (default `flex-start` — top), `--hub-panels-alert-content-justify` (default `flex-start`) and `--hub-panels-alert-content-gap` (default `var(--hub-sys-gap-2)`). Override any to re-flow the alert content (e.g. icon + message) without touching the component.
+
+### Changed
+
+- The alert variant tints are now generated through a `hub-panels-alert-variant($variant)` Sass mixin (instead of an inline `@each` body), so adding or auditing a variant is a single `@include` with no duplicated colour values.
+
+- All `<hub-panels>` and alert accent derivations (`-emphasis`, `-subtle`, and the alert bg/color/border) now interpolate in the **OKLCH** colour space (`color-mix(in oklch, …)`) instead of sRGB, for perceptually even tints across every accent. No token API change; tints shift very slightly.
 
 ## [22.1.1] - 2026-06-25
 

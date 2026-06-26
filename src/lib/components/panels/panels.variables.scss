@@ -24,6 +24,9 @@
 	--hub-panels-accent: var(--hub-sys-color-primary, #0d6efd);
 	--hub-panels-accent-emphasis: var(--hub-sys-color-primary-emphasis, #0a58ca);
 	--hub-panels-accent-subtle: var(--hub-sys-color-primary-subtle, #e7f1ff);
+	// Contrast / on-color: text that sits ON the accent (e.g. the active pill).
+	// Grayscale flip driven by the accent's own lightness, recomputed at runtime.
+	--hub-panels-accent-on: var(--hub-sys-color-primary-on, #fff);
 
 	// Strip + content — outer container chrome inherits from the
 	// `--hub-container-*` base layer (re-basable per subtree), each
@@ -85,7 +88,7 @@
 	--hub-panels-nav-gap: 0;
 	--hub-panels-pill-border-radius: var(--hub-ref-radius-pill, 50rem);
 	--hub-panels-pill-bg-active: var(--hub-panels-accent);
-	--hub-panels-pill-color-active: var(--hub-ref-color-white, #fff);
+	--hub-panels-pill-color-active: var(--hub-panels-accent-on);
 	--hub-panels-pill-gap: var(--hub-ref-space-2, 0.5rem);
 	--hub-panels-pill-content-border-width: 0;
 	--hub-panels-remove-btn-opacity: 0.6;
@@ -161,23 +164,29 @@
 // the exact `ng-hub-ui-ds` tints. `:where()` keeps zero specificity so theme
 // rules still win.
 
-// Open default — any variant the host application defines. The derived roles
-// are mixed from the single inline accent so a custom palette interconnects
-// with zero per-colour CSS here.
+// Open-set default — ANY variant the host application defines. The derived
+// roles are mixed from the single inline accent so a custom palette
+// interconnects with ONE CSS rule the user writes:
+//   :root { --hub-sys-color-brand: #ff6b00; }
+// then `<hub-panels variant="brand">` works with zero per-colour CSS here.
 :where(.hub-panels[data-variant]) {
-	--hub-panels-accent-emphasis: color-mix(in srgb, var(--hub-panels-accent) 80%, var(--hub-sys-color-ink, #212529));
-	--hub-panels-accent-subtle: color-mix(in srgb, var(--hub-panels-accent) 12%, var(--hub-sys-surface-page, #fff));
+	--hub-panels-accent-emphasis: color-mix(in oklch, var(--hub-panels-accent) 80%, var(--hub-sys-color-ink, #212529));
+	--hub-panels-accent-subtle: color-mix(in oklch, var(--hub-panels-accent) 12%, var(--hub-sys-surface-page, #fff));
+	--hub-panels-accent-on: oklch(from var(--hub-panels-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h);
 }
 
 // Built-in semantic variants — exact, accessibility-tuned design-system tints.
 // NO colour values live here, only the variant names and the token contract.
 // Must follow the open default so the precise tints win over the generic mix.
-$hub-panels-variants: primary, success, danger, warning, info;
+// The full open accent set: primary, secondary, success, danger, warning,
+// info, neutral, light, dark.
+$hub-panels-variants: primary, secondary, success, danger, warning, info, neutral, light, dark;
 
 @each $variant in $hub-panels-variants {
 	:where(.hub-panels[data-variant='#{$variant}']) {
 		--hub-panels-accent: var(--hub-sys-color-#{$variant});
 		--hub-panels-accent-emphasis: var(--hub-sys-color-#{$variant}-emphasis);
 		--hub-panels-accent-subtle: var(--hub-sys-color-#{$variant}-subtle);
+		--hub-panels-accent-on: var(--hub-sys-color-#{$variant}-on);
 	}
 }

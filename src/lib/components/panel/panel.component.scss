@@ -94,6 +94,13 @@
 	--hub-panels-alert-padding-y: var(--hub-ref-space-3, 1rem);
 	--hub-panels-alert-border-radius: var(--hub-ref-radius-md, 0.375rem);
 	--hub-panels-alert-accent-width: 0.25rem;
+	// Content layout of the alert body (e.g. icon + message). Defaults to a row
+	// aligned to the top, driven by the canonical structural scale — override any
+	// of these to re-flow the content (column, centered, different gap…).
+	--hub-panels-alert-content-direction: row;
+	--hub-panels-alert-content-align: flex-start;
+	--hub-panels-alert-content-justify: flex-start;
+	--hub-panels-alert-content-gap: var(--hub-sys-gap-2, 0.5rem);
 }
 
 // Open default — ANY variant the host application defines. The component sets
@@ -102,9 +109,9 @@
 // consumer with a custom accent palette (e.g. `variant="brand"` backed by
 // `--hub-sys-color-brand`) interconnects with zero per-colour CSS in this file.
 :where(.hub-panels__panel--alert[data-variant]) {
-	--hub-panels-alert-bg: color-mix(in srgb, var(--hub-panels-alert-accent) 14%, var(--hub-sys-surface-page, #fff));
-	--hub-panels-alert-color: color-mix(in srgb, var(--hub-panels-alert-accent) 72%, var(--hub-sys-text-primary, #212529));
-	--hub-panels-alert-border-color: color-mix(in srgb, var(--hub-panels-alert-accent) 30%, transparent);
+	--hub-panels-alert-bg: color-mix(in oklch, var(--hub-panels-alert-accent) 14%, var(--hub-sys-surface-page, #fff));
+	--hub-panels-alert-color: color-mix(in oklch, var(--hub-panels-alert-accent) 72%, var(--hub-sys-text-primary, #212529));
+	--hub-panels-alert-border-color: color-mix(in oklch, var(--hub-panels-alert-accent) 30%, transparent);
 }
 
 // Built-in semantic variants use the exact, accessibility-tuned design-system
@@ -113,13 +120,21 @@
 // fall through to the open color-mix default above, and ultimately to the
 // neutral fallback at the usage site below. Custom variants are not listed here;
 // they are served entirely by that open default.
-$hub-alert-variants: primary, success, danger, warning, info;
+$hub-alert-variants: primary, secondary, success, danger, warning, info, neutral, light, dark;
+
+// The alert variant is generated through this mixin: it maps a variant name to
+// the exact `ng-hub-ui-ds` tints. Adding or auditing a variant — or registering a
+// custom one in a consuming app — is a one-line `@include`, with no duplicated
+// colour values.
+@mixin hub-panels-alert-variant($variant) {
+	--hub-panels-alert-bg: var(--hub-sys-color-#{$variant}-subtle);
+	--hub-panels-alert-color: var(--hub-sys-color-#{$variant}-emphasis);
+	--hub-panels-alert-border-color: var(--hub-sys-color-#{$variant}-border-subtle);
+}
 
 @each $variant in $hub-alert-variants {
 	:where(.hub-panels__panel--alert[data-variant='#{$variant}']) {
-		--hub-panels-alert-bg: var(--hub-sys-color-#{$variant}-subtle);
-		--hub-panels-alert-color: var(--hub-sys-color-#{$variant}-emphasis);
-		--hub-panels-alert-border-color: var(--hub-sys-color-#{$variant}-border-subtle);
+		@include hub-panels-alert-variant($variant);
 	}
 }
 
@@ -140,6 +155,11 @@ $hub-alert-variants: primary, success, danger, warning, info;
 	overflow: hidden; // clip header/footer bands to the rounded corners
 
 	.hub-panels__panel-body {
+		display: flex;
+		flex-direction: var(--hub-panels-alert-content-direction);
+		align-items: var(--hub-panels-alert-content-align);
+		justify-content: var(--hub-panels-alert-content-justify);
+		gap: var(--hub-panels-alert-content-gap);
 		padding: var(--hub-panels-alert-padding-y) var(--hub-panels-alert-padding-x);
 	}
 }
