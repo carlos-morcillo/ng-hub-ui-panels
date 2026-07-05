@@ -1,0 +1,33 @@
+<ul
+	class="hub-tab-nav__nav"
+	role="tablist"
+	[attr.aria-orientation]="vertical() ? 'vertical' : 'horizontal'"
+	[class.hub-tab-nav__nav--tabs]="appearance() === 'tabs'"
+	[class.hub-tab-nav__nav--pills]="appearance() === 'pills'"
+	[class.hub-tab-nav__nav--vertical]="vertical()"
+	[class.hub-tab-nav__nav--justified]="justified()"
+>
+	@for (item of items(); track item.value; let i = $index) {
+		<li
+			class="hub-tab-nav__nav-item"
+			[class.hub-tab-nav__nav-item--active]="isActive(item)"
+			[class.hub-tab-nav__nav-item--disabled]="!!item.disabled"
+		>
+			<button
+				type="button"
+				class="hub-tab-nav__nav-link"
+				role="tab"
+				[id]="itemId(item, i)"
+				[class.hub-tab-nav__nav-link--active]="isActive(item)"
+				[class.hub-tab-nav__nav-link--disabled]="!!item.disabled"
+				[disabled]="!!item.disabled"
+				[attr.aria-selected]="isActive(item)"
+				[attr.tabindex]="tabIndexFor(i)"
+				(click)="select(item)"
+				(keydown)="onKeydown($event, i)"
+			>
+				{{ item.label }}
+			</button>
+		</li>
+	}
+</ul>

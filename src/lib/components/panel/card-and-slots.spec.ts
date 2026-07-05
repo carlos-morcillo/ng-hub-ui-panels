@@ -78,6 +78,38 @@ class AlertInTabsHost {}
 })
 class CustomVariantAlertHost {}
 
+@Component({
+	selector: 'spec-nested-feature',
+	standalone: true,
+	imports: [PanelComponent],
+	template: `<hub-panel><p>nested card body</p></hub-panel>`
+})
+class NestedFeatureComponent {}
+
+@Component({
+	standalone: true,
+	imports: [PanelsComponent, PanelComponent, NestedFeatureComponent],
+	template: `
+		<hub-panels type="tabs">
+			<hub-panel heading="Tab A"><spec-nested-feature /></hub-panel>
+		</hub-panels>
+	`
+})
+class NestedStandaloneInTabsHost {}
+
+@Component({
+	standalone: true,
+	imports: [PanelsComponent, PanelComponent],
+	template: `
+		<hub-panels type="tabs">
+			@if (true) {
+				<hub-panel heading="Wrapped">Wrapped body</hub-panel>
+			}
+		</hub-panels>
+	`
+})
+class EmbeddedViewPanelHost {}
+
 describe('panels card view + content header/footer slots', () => {
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
@@ -140,6 +172,34 @@ describe('panels card view + content header/footer slots', () => {
 			const footer = fixture.nativeElement.querySelector('[hubPanelFooter]');
 			expect(header?.classList).toContain('hub-panels__panel-header');
 			expect(footer?.classList).toContain('hub-panels__panel-footer');
+		});
+
+		it('renders as a visible card when nested transitively inside a tab pane (no group capture)', () => {
+			const fixture = TestBed.createComponent(NestedStandaloneInTabsHost);
+			fixture.detectChanges();
+
+			const root = fixture.nativeElement as HTMLElement;
+			// The outer group only registered its direct child: one tab link, one tabpanel.
+			expect(root.querySelectorAll('.hub-panels__nav-link').length).toBe(1);
+			expect(root.querySelectorAll('[role="tabpanel"]').length).toBe(1);
+
+			// The nested panel renders as a standalone card, not as a hidden tab.
+			const nested = root.querySelector('spec-nested-feature .hub-panels__panel') as HTMLElement;
+			expect(nested).not.toBeNull();
+			expect(nested.classList).toContain('hub-panels__panel--card');
+			expect(nested.getAttribute('role')).toBeNull();
+			expect(nested.textContent).toContain('nested card body');
+		});
+
+		it('still registers panels wrapped in a control-flow block of the same template', () => {
+			const fixture = TestBed.createComponent(EmbeddedViewPanelHost);
+			fixture.detectChanges();
+
+			const root = fixture.nativeElement as HTMLElement;
+			const link = root.querySelector('.hub-panels__nav-link');
+			expect(link?.textContent).toContain('Wrapped');
+			expect(root.querySelectorAll('[role="tabpanel"]').length).toBe(1);
+			expect(root.querySelector('[role="tabpanel"]')?.classList).toContain('hub-panels__panel--active');
 		});
 	});
 

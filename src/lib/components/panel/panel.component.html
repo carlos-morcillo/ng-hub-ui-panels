@@ -30,6 +30,7 @@
 	 bug that conditional slots cause. Header/footer render in every view; the
 	 `card` view styles them as the card's header and footer bands. -->
 <div
+	class="hub-panels__panel-collapse"
 	[class.hub-panels__accordion-collapse]="accordionView()"
 	[class.hub-panels__accordion-collapse--collapsed]="accordionView() && !active()"
 	[attr.role]="accordionView() ? 'region' : null"
@@ -38,7 +39,7 @@
 	[attr.aria-hidden]="accordionView() ? !active() : null"
 	[attr.inert]="accordionView() && !active() ? '' : null"
 >
-	<div [class.hub-panels__accordion-body]="accordionView()">
+	<div class="hub-panels__panel-region" [class.hub-panels__accordion-body]="accordionView()">
 		<ng-content select="[hubPanelHeader]" />
 		<div class="hub-panels__panel-body">
 			<ng-content />

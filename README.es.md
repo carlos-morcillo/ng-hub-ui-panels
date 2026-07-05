@@ -75,6 +75,7 @@ Los componentes son standalone — impórtalos directamente donde los uses:
 import {
 	PanelsComponent,
 	PanelComponent,
+	HubTabNavComponent,
 	PanelHeadingDirective,
 	PanelHeaderDirective,
 	PanelFooterDirective
@@ -107,6 +108,7 @@ sí mismo.
 ## 🎯 Características
 
 - **Cuatro visualizaciones** — `tabs`, `pills`, `accordion` y `card`, con un único input `type`.
+- **Tira ligera enlazada a valor** — `<hub-tab-nav>` es una tira de tabs controlada y sin contenido: emite el `value` seleccionado desde un array `items` y te deja renderizar la vista tú mismo (segmented controls, filtros, tabs con contenido externo).
 - **Layout card y standalone** — `type="card"` renderiza cada panel como una card siempre visible; un único `<hub-panel>` también funciona por sí solo, fuera de cualquier contenedor.
 - **Slots de cabecera/pie de contenido** — `hubPanelHeader` y `hubPanelFooter` marcan bandas de cabecera/pie que se renderizan en todas las vistas (distintas de la etiqueta de navegación `hubPanelHeading`).
 - **Formularios** — implementa `ControlValueAccessor`; vincula el/los panel(es) activo(s) a un `FormControl` o `ngModel` (simple o `multiple`), con `bindValue` y `compareWith`.
@@ -202,6 +204,29 @@ una card por sí mismo:
 > `hubPanelHeader` / `hubPanelFooter` son bandas de contenido dentro del cuerpo del
 > panel y se renderizan en **todas** las vistas. Son distintas de `hubPanelHeading`,
 > que es la etiqueta de navegación (tab) o el botón de disclosure del accordion.
+
+#### Slots de card — `variant`, `flush`, `fill`
+
+Una card simple expone tres inputs:
+
+- **`variant`** — tiñe toda la card — fondo / texto / borde **y las bandas `hubPanelHeader` / `hubPanelFooter`** (un tinte algo más fuerte del mismo acento) — desde un único acento semántico (`primary` … `neutral`, o cualquier color), con el mismo modelo `color-mix` que usa el alert (sin añadir valores de color). `--hub-panels-card-border-style` fija el estilo del borde, p. ej. `dashed` para un estado vacío.
+- **`flush`** — quita el padding del cuerpo para alojar una tabla / lista / media de borde a borde.
+- **`fill`** — hace que la card ocupe el alto del padre y su cuerpo haga scroll, acotando por fin una región interna con `flex: 1`. `--hub-panels-body-gap` espacia los hijos apilados del cuerpo.
+
+> **Dos inputs `flush` distintos.** `<hub-panel flush>` (este) pone a `0` el **padding del cuerpo del card** para que el contenido proyectado toque los bordes internos. `<hub-panels flush>` es un input aparte del **contenedor** que, en la vista accordion, quita el **chrome exterior** del accordion (bordes laterales + radio). Distinto elemento, distinta vista, distinto efecto — nunca colisionan.
+
+```html
+<hub-panel variant="success"><div hubPanelHeader>Success</div> Card teñida.</hub-panel>
+
+<hub-panel flush>
+	<div hubPanelHeader>Flush</div>
+	<div>Va de borde a borde del card.</div>
+</hub-panel>
+
+<div style="height: 240px; display: flex;">
+	<hub-panel fill style="flex: 1;"> …contenido largo con scroll… </hub-panel>
+</div>
+```
 
 ### Alertas
 
@@ -357,6 +382,10 @@ Cuando el panel activo está enrutado, el área de contenido renderiza un
 | Input | Tipo | Por defecto | Descripción |
 | --- | --- | --- | --- |
 | `heading` | `string` | `undefined` | Cabecera de texto (se ignora con `hubPanelHeading`). |
+| `variant` | `HubSemanticColor \| string` | `undefined` | Solo card: tiñe toda la card desde un acento semántico (reflejado como `data-variant`). |
+| `flush` | `boolean` | `false` | Solo card: quita el padding del cuerpo para contenido a sangre. |
+| `fill` | `boolean` | `false` | Solo card: ocupa el alto del padre y hace scroll del cuerpo. |
+| `standalone` | atributo | — | Atributo estático: saca un `<hub-panel>` suelto de un `<hub-panels>` ancestro para que renderice como card. |
 | `id` | `string` | auto | Id para el emparejamiento ARIA. |
 | `value` | `unknown` | `id` | Valor aportado al control de formulario. |
 | `active` | `boolean` (model) | `false` | Estado activo/expandido bidireccional. |
@@ -374,6 +403,27 @@ Cuando el panel activo está enrutado, el área de contenido renderiza un
 | `selectPanel` | `PanelComponent` | Se emite cuando el panel se activa. |
 | `deselectPanel` | `PanelComponent` | Se emite cuando el panel deja de estar activo. |
 | `removed` | `PanelComponent` | Se emite al eliminarlo (✕ o Delete). |
+
+### `<hub-tab-nav>` — tira ligera enlazada a valor
+
+Una tira de tabs controlada y sin contenido. Renderiza solo la fila de cabeceras y
+emite el `value` seleccionado; el consumidor renderiza la vista activa por su cuenta.
+
+```html
+<hub-tab-nav [items]="tabs" [(active)]="selected" appearance="pills" />
+```
+
+| Input | Tipo | Por defecto | Descripción |
+| --- | --- | --- | --- |
+| `items` | `HubTabNavItem[]` | `[]` | Los tabs seleccionables (`{ value, label, disabled?, id? }`). |
+| `active` | `unknown` (model) | `undefined` | Valor seleccionado bidireccional; `activeChange` se emite al cambiar. |
+| `appearance` | `'tabs' \| 'pills'` | `'tabs'` | Tabs subrayados o pills redondeados. |
+| `justified` | `boolean` | `false` | Estira los tabs a igual ancho. |
+| `vertical` | `boolean` | `false` | Apila la tira en vertical. |
+
+| Output | Payload | Descripción |
+| --- | --- | --- |
+| `activeChange` | `unknown` | Se emite con el nuevo valor cuando cambia el tab seleccionado. |
 
 ### Directivas
 

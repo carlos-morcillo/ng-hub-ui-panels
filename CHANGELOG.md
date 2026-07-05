@@ -5,6 +5,32 @@ All notable changes to the ng-hub-ui-panels library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [22.4.0] - 2026-07-05
+
+### Added
+
+- **`<hub-tab-nav>` — lightweight, value-bound tab strip.** New standalone `HubTabNavComponent` (selector `hub-tab-nav`, `exportAs="hubTabNav"`): a content-less, controlled tab strip that renders an accessible `role="tablist"` of `role="tab"` buttons from a plain `items` array (`HubTabNavItem[]`) and emits the selected value through the two-way `active` model (`activeChange` output). Unlike `<hub-panels type="tabs">` it owns no panes — the consumer renders the active view itself from `active()` / `(activeChange)` — so it fits segmented controls, filter switches and manual tabs-with-external-content. Inputs: `appearance` (`'tabs' | 'pills'`, default `'tabs'`), `justified`, `vertical`. Roving-`tabindex` keyboard navigation (arrows activate + move focus, `Home` / `End`, disabled tabs skipped) and `aria-selected` on the active tab. Reuses the `<hub-panels>` strip look through the shared `--hub-panels-*` tokens and adds two strip-local tokens, `--hub-tabs-indicator-color` (active underline / pill fill) and `--hub-tabs-gap` (inter-tab gap).
+- **`<hub-panel>` — semantic card variant tint.** A plain (non-alert) card now honours `[variant]`: it reflects `data-variant` and derives its background / text / border — **and its `hubPanelHeader` / `hubPanelFooter` bands** (a slightly stronger tint of the same accent so they still read as bands) — from a single inline accent with the same open `color-mix` + built-in-ds-tint model the alert already uses (no colour values added). New `--hub-panels-card-accent` slot; new `--hub-panels-card-border-style` exposes the frame border style (e.g. `dashed` for an empty-state card).
+- **`<hub-panel flush>` — zero body padding.** New `flush` input removes the card body padding (`--hub-panels-card-padding-x/-y` → 0) so a card can host a table / list / media block edge-to-edge, replacing per-site inline overrides. (Distinct from the existing `<hub-panels flush>` container input, which flattens the accordion frame.)
+- **`<hub-panel fill>` — fill-height card with a scrolling body.** New `fill` input makes the host, both content wrappers and the body a flex column (`flex: 1; min-height: 0`); the body scrolls, so an inner `flex: 1` region (e.g. a tab strip + scroll pane) is finally bounded. New `--hub-panels-body-gap` spaces stacked body children. The two body wrappers now carry stable classes (`.hub-panels__panel-collapse`, `.hub-panels__panel-region`).
+- **`<hub-panel standalone>` — explicit DI opt-out.** A static `standalone` attribute makes a loose `<hub-panel>` render as a plain card even when placed **directly** inside a tabs / pills / accordion `<hub-panels>` in the same template (the case `host: true` alone cannot cover) — it skips registration so it never becomes a hidden `role="tabpanel"`.
+
+### Changed
+
+- **`--hub-panels-card-box-shadow` and `--hub-panels-panel-header-bg` are now inheritable.** Their defaults moved from a declaration on the consuming element to the usage-site `var()` fallback, so an ancestor (a page shell) can set either token and have it inherit through to the card frame / header band. Identical default → no visual change.
+
+## [22.3.0] - 2026-07-02
+
+### Fixed
+
+- **A standalone `<hub-panel>` nested (transitively) inside a tab pane no longer registers as a hidden tab of the outer `<hub-panels>`.** The panel discovered its group by injecting `PanelsComponent`, and Angular's hierarchical DI walks the whole ancestor injector tree — so a content-card `<hub-panel>` inside a component projected into a tab pane resolved the OUTER group, registered as one of its tabs and rendered as an inactive (invisible) `role="tabpanel"`. The injection is now bounded with `host: true`: a panel binds only to a group declared in the same template (its direct container) and renders as a standalone card/alert otherwise. Direct children — including panels under `@if` / `@for` blocks of the same template — keep registering exactly as before, and the consumer-side `providers: [{ provide: PanelsComponent, useValue: null }]` workaround is no longer needed. Behaviour note: a wrapper component whose own template renders the `<hub-panel>` no longer attaches it to a group outside that template — project the content into the group's pane instead.
+
+### Changed
+
+- **Canonical accent-slot derivation for the group accent.** The `<hub-panels>` role family is now derived LOCALLY from the single `--hub-panels-accent` slot with the canonical design-system formulas — `--hub-panels-accent-emphasis: color-mix(in oklch, accent 80%, --hub-sys-color-ink)`, `--hub-panels-accent-subtle: color-mix(in oklch, accent 12%, --hub-sys-surface-page)` and the `oklch(from …)` lightness flip for `--hub-panels-accent-on` — instead of pointing at the pre-computed `--hub-sys-color-primary-*` tints. The built-in `variant`s now re-base ONLY the accent slot (`--hub-panels-accent: var(--hub-sys-color-<variant>)`), never the derived roles, so **custom accents now re-derive the full role family at runtime** (e.g. `--hub-panels-accent: gold` recolours emphasis/subtle/on in one hook). Visual output with the predefined variants is equivalent — the canonical formulas produce the same tints the ds families ship. The now-redundant open-set `[data-variant]` re-derivation rule was removed (the base derivations already recompute on the same element).
+- The alert open-set default (`appearance="alert"` with a custom variant) now uses the same canonical tints: background `12%` over `--hub-sys-surface-page` (was `14%`) and text `80%` over `--hub-sys-color-ink` (was `72%` over `--hub-sys-text-primary`), so a custom alert variant renders exactly like a built-in with the same accent. Built-in alert variants keep the exact ds tints — unchanged.
+- Docs: `docs/css-variables-reference.md` default values resynchronized with the actual code declarations (now guarded by the repo-level `tokens-parity` check F).
+
 ## [22.2.0] - 2026-06-26
 
 ### Added

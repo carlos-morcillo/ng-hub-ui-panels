@@ -11,6 +11,7 @@ Use these variables to customize the visual appearance without editing component
 - [Layout & Content](#layout--content)
 - [Tab Headers](#tab-headers)
 - [Pills](#pills)
+- [Tab Nav (`<hub-tab-nav>`)](#tab-nav-hub-tab-nav)
 - [Accordion View](#accordion-view)
 - [Card & Content Slots](#card--content-slots)
 - [Customization Examples](#customization-examples)
@@ -42,14 +43,14 @@ you write — e.g. `hub-panels { --hub-panels-tab-color-active: #198754; }` — 
 | Variable | Default |
 | --- | --- |
 | `--hub-panels-flex-direction` | `row` |
-| `--hub-panels-border-width` | `1px` |
-| `--hub-panels-border-color` | `#dee2e6` |
-| `--hub-panels-border-radius` | `0.375rem` |
-| `--hub-panels-content-bg` | `#fff` |
+| `--hub-panels-border-width` | `var(--hub-container-border-width, var(--hub-ref-border-width, 1px))` |
+| `--hub-panels-border-color` | `var(--hub-container-border-color, var(--hub-sys-border-color-default, #dee2e6))` |
+| `--hub-panels-border-radius` | `var(--hub-container-border-radius, var(--hub-ref-radius-md, 0.375rem))` |
+| `--hub-panels-content-bg` | `var(--hub-container-bg, var(--hub-sys-surface-page, #fff))` |
 | `--hub-panels-header-bg` | `var(--hub-panels-content-bg)` |
 | `--hub-panels-content-box-shadow` | `none` |
-| `--hub-panels-content-padding-x` | `1rem` |
-| `--hub-panels-content-padding-y` | `1rem` |
+| `--hub-panels-content-padding-x` | `var(--hub-container-padding-x, var(--hub-ref-space-3, 1rem))` |
+| `--hub-panels-content-padding-y` | `var(--hub-container-padding-y, var(--hub-ref-space-3, 1rem))` |
 | `--hub-panels-nav-gap` | `0` |
 | `--hub-panels-nav-btn-width` | `1.5rem` |
 | `--hub-panels-nav-btn-height` | `1.5rem` |
@@ -63,25 +64,25 @@ Used by the `tabs` and `pills` strip headers.
 | Variable | Default |
 | --- | --- |
 | `--hub-panels-tab-font-family` | inherits container font |
-| `--hub-panels-tab-font-size` | `1rem` |
-| `--hub-panels-tab-font-weight` | `500` |
-| `--hub-panels-tab-line-height` | `1.5` |
-| `--hub-panels-tab-padding-x` | `1rem` |
-| `--hub-panels-tab-padding-y` | `0.5rem` |
-| `--hub-panels-tab-gap` | `0.5rem` |
-| `--hub-panels-tab-color` | `#212529` |
+| `--hub-panels-tab-font-size` | `var(--hub-container-font-size, var(--hub-ref-font-size-base, 1rem))` |
+| `--hub-panels-tab-font-weight` | `var(--hub-ref-font-weight-medium, 500)` |
+| `--hub-panels-tab-line-height` | `var(--hub-ref-line-height-base, 1.5)` |
+| `--hub-panels-tab-padding-x` | `var(--hub-panels-nav-link-padding-x)` |
+| `--hub-panels-tab-padding-y` | `var(--hub-panels-nav-link-padding-y)` |
+| `--hub-panels-tab-gap` | `var(--hub-ref-space-2, 0.5rem)` |
+| `--hub-panels-tab-color` | `var(--hub-panels-nav-link-color)` |
 | `--hub-panels-tab-bg` | `transparent` |
-| `--hub-panels-tab-bg-hover` | `#f8f9fa` |
-| `--hub-panels-tab-color-hover` | `#0a58ca` |
-| `--hub-panels-tab-color-active` | `#0d6efd` |
-| `--hub-panels-tab-bg-active` | `#fff` |
-| `--hub-panels-tab-border-color-active` | `#0d6efd` |
+| `--hub-panels-tab-bg-hover` | `var(--hub-ref-surface-2, #f8f9fa)` |
+| `--hub-panels-tab-color-hover` | `var(--hub-panels-nav-link-hover-color)` |
+| `--hub-panels-tab-color-active` | `var(--hub-panels-nav-link-active-color)` |
+| `--hub-panels-tab-bg-active` | `var(--hub-panels-nav-link-active-bg)` |
+| `--hub-panels-tab-border-color-active` | `var(--hub-panels-accent)` |
 | `--hub-panels-tab-active-shadow` | `0 -0.25rem 0.5rem rgba(0, 0, 0, 0.06)` |
 | `--hub-panels-tab-active-shadow-vertical` | `-0.25rem 0 0.5rem rgba(0, 0, 0, 0.06)` |
-| `--hub-panels-tab-color-disabled` | `#6c757d` |
-| `--hub-panels-tab-focus-ring-width` | `0.25rem` |
-| `--hub-panels-tab-focus-ring-color` | `rgba(13, 110, 253, 0.25)` |
-| `--hub-panels-tab-transition` | `all 0.2s ease-in-out` |
+| `--hub-panels-tab-color-disabled` | `var(--hub-panels-nav-link-disabled-color)` |
+| `--hub-panels-tab-focus-ring-width` | `var(--hub-sys-focus-ring-width, 0.25rem)` |
+| `--hub-panels-tab-focus-ring-color` | `var(--hub-sys-focus-ring-color, rgba(13, 110, 253, 0.25))` |
+| `--hub-panels-tab-transition` | `var(--hub-sys-transition-base, all 0.2s ease-in-out)` |
 | `--hub-panels-remove-btn-opacity` | `0.6` |
 | `--hub-panels-remove-btn-opacity-hover` | `1` |
 
@@ -91,12 +92,25 @@ Used by the `tabs` and `pills` strip headers.
 
 | Variable | Default |
 | --- | --- |
-| `--hub-panels-pill-border-radius` | `50rem` |
-| `--hub-panels-pill-bg-active` | `#0d6efd` |
-| `--hub-panels-pill-color-active` | `#fff` |
-| `--hub-panels-pill-gap` | `0.5rem` |
+| `--hub-panels-pill-border-radius` | `var(--hub-ref-radius-pill, 50rem)` |
+| `--hub-panels-pill-bg-active` | `var(--hub-panels-accent)` |
+| `--hub-panels-pill-color-active` | `var(--hub-panels-accent-on)` |
+| `--hub-panels-pill-gap` | `var(--hub-ref-space-2, 0.5rem)` |
 | `--hub-panels-pill-content-border-width` | `0` |
-| `--hub-panels-nav-content-gap` | `1rem` |
+| `--hub-panels-nav-content-gap` | `var(--hub-ref-space-2, 0.5rem)` |
+
+---
+
+## Tab Nav (`<hub-tab-nav>`)
+
+Strip-local tokens for the lightweight `<hub-tab-nav>` primitive. Every other
+affordance reuses the `--hub-panels-*` tab tokens above (inherited when the strip
+is nested in a themed panels subtree, literal fallbacks otherwise).
+
+| Variable | Default |
+| --- | --- |
+| `--hub-tabs-indicator-color` | `var(--hub-panels-accent, var(--hub-sys-color-primary, #0d6efd))` |
+| `--hub-tabs-gap` | `0` |
 
 ---
 
@@ -118,26 +132,26 @@ Each token falls back to the matching `--hub-accordion-*` variable.
 
 | Variable | Default |
 | --- | --- |
-| `--hub-panels-accordion-color` | `#212529` |
-| `--hub-panels-accordion-bg` | `#fff` |
-| `--hub-panels-accordion-border-width` | `1px` |
-| `--hub-panels-accordion-border-color` | `#dee2e6` |
-| `--hub-panels-accordion-border-radius` | `0.25rem` |
-| `--hub-panels-accordion-btn-padding-x` | `1.25rem` |
-| `--hub-panels-accordion-btn-padding-y` | `1rem` |
-| `--hub-panels-accordion-btn-color` | `#212529` |
-| `--hub-panels-accordion-btn-bg` | `#fff` |
-| `--hub-panels-accordion-active-color` | `#0c63e4` |
-| `--hub-panels-accordion-active-bg` | `#e7f1ff` |
+| `--hub-panels-accordion-color` | `var(--hub-accordion-color, var(--hub-sys-text-primary, #212529))` |
+| `--hub-panels-accordion-bg` | `var(--hub-accordion-bg, var(--hub-sys-surface-page, #fff))` |
+| `--hub-panels-accordion-border-width` | `var(--hub-accordion-border-width, var(--hub-ref-border-width, 1px))` |
+| `--hub-panels-accordion-border-color` | `var(--hub-accordion-border-color, var(--hub-sys-border-color-default, #dee2e6))` |
+| `--hub-panels-accordion-border-radius` | `var(--hub-accordion-border-radius, var(--hub-ref-radius-sm, 0.25rem))` |
+| `--hub-panels-accordion-btn-padding-x` | `var(--hub-accordion-btn-padding-x, 1.25rem)` |
+| `--hub-panels-accordion-btn-padding-y` | `var(--hub-accordion-btn-padding-y, var(--hub-ref-space-3, 1rem))` |
+| `--hub-panels-accordion-btn-color` | `var(--hub-accordion-btn-color, var(--hub-sys-text-primary, #212529))` |
+| `--hub-panels-accordion-btn-bg` | `var(--hub-accordion-btn-bg, var(--hub-sys-surface-page, #fff))` |
+| `--hub-panels-accordion-active-color` | `var(--hub-accordion-active-color, var(--hub-panels-accent-emphasis))` |
+| `--hub-panels-accordion-active-bg` | `var(--hub-accordion-active-bg, var(--hub-panels-accent-subtle))` |
 | `--hub-panels-accordion-icon-color` | inherits btn color |
 | `--hub-panels-accordion-icon-active-color` | inherits active color |
-| `--hub-panels-accordion-btn-icon-width` | `1.25rem` |
-| `--hub-panels-accordion-btn-icon-transform` | `rotate(-180deg)` |
-| `--hub-panels-accordion-btn-icon-transition` | `transform 0.2s ease-in-out` |
-| `--hub-panels-accordion-collapse-transition-duration` | `0.25s` |
+| `--hub-panels-accordion-btn-icon-width` | `var(--hub-accordion-btn-icon-width, 1.25rem)` |
+| `--hub-panels-accordion-btn-icon-transform` | `var(--hub-accordion-btn-icon-transform, rotate(-180deg))` |
+| `--hub-panels-accordion-btn-icon-transition` | `var(--hub-accordion-btn-icon-transition, transform 0.2s ease-in-out)` |
+| `--hub-panels-accordion-collapse-transition-duration` | `var(--hub-accordion-collapse-transition-duration, 0.25s)` |
 | `--hub-panels-accordion-collapse-transition-easing` | `cubic-bezier(0.4, 0, 0.2, 1)` |
-| `--hub-panels-accordion-body-padding-x` | `1.25rem` |
-| `--hub-panels-accordion-body-padding-y` | `1rem` |
+| `--hub-panels-accordion-body-padding-x` | `var(--hub-accordion-body-padding-x, 1.25rem)` |
+| `--hub-panels-accordion-body-padding-y` | `var(--hub-accordion-body-padding-y, var(--hub-ref-space-3, 1rem))` |
 
 ---
 
@@ -150,22 +164,25 @@ is themable too — target `hub-panel { … }` when there is no `.hub-panels` an
 
 | Variable | Default |
 | --- | --- |
-| `--hub-panels-card-bg` | `#fff` |
-| `--hub-panels-card-color` | `#212529` |
-| `--hub-panels-card-border-width` | `1px` |
-| `--hub-panels-card-border-color` | `#dee2e6` |
-| `--hub-panels-card-border-radius` | `0.375rem` |
-| `--hub-panels-card-box-shadow` | `0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)` |
-| `--hub-panels-card-padding-x` | `1.25rem` |
-| `--hub-panels-card-padding-y` | `1rem` |
+| `--hub-panels-card-bg` | `var(--hub-sys-surface-page, #fff)` |
+| `--hub-panels-card-color` | `var(--hub-sys-text-primary, #212529)` |
+| `--hub-panels-card-border-width` | `var(--hub-ref-border-width, 1px)` |
+| `--hub-panels-card-border-color` | `var(--hub-sys-border-color-default, #dee2e6)` |
+| `--hub-panels-card-border-radius` | `var(--hub-ref-radius-md, 0.375rem)` |
+| `--hub-panels-card-border-style` | `solid` (e.g. `dashed` for an empty-state card) |
+| `--hub-panels-card-box-shadow` | `var(--hub-sys-shadow-sm, 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075))` |
+| `--hub-panels-card-accent` | `var(--hub-sys-border-color-default, #dee2e6)` (semantic tint slot for `[variant]`) |
+| `--hub-panels-card-padding-x` | `var(--hub-ref-space-4, 1.5rem)` |
+| `--hub-panels-card-padding-y` | `var(--hub-ref-space-3, 1rem)` |
+| `--hub-panels-body-gap` | `0` (gap between stacked body children in `fill` mode) |
 | `--hub-panels-card-gap` | `1rem` (between cards in the container) |
-| `--hub-panels-panel-header-bg` | `#f8f9fa` |
-| `--hub-panels-panel-header-color` | `#212529` |
-| `--hub-panels-panel-header-padding-x` | `1.25rem` |
-| `--hub-panels-panel-header-padding-y` | `1rem` |
-| `--hub-panels-panel-header-font-weight` | `600` |
-| `--hub-panels-panel-header-border-width` | `1px` |
-| `--hub-panels-panel-header-border-color` | `#dee2e6` |
+| `--hub-panels-panel-header-bg` | `var(--hub-sys-surface-elevated, #f8f9fa)` |
+| `--hub-panels-panel-header-color` | `var(--hub-sys-text-primary, #212529)` |
+| `--hub-panels-panel-header-padding-x` | `var(--hub-ref-space-4, 1.5rem)` |
+| `--hub-panels-panel-header-padding-y` | `var(--hub-ref-space-3, 1rem)` |
+| `--hub-panels-panel-header-font-weight` | `var(--hub-ref-font-weight-semibold, 600)` |
+| `--hub-panels-panel-header-border-width` | `var(--hub-ref-border-width, 1px)` |
+| `--hub-panels-panel-header-border-color` | `var(--hub-sys-border-color-default, #dee2e6)` |
 
 ---
 

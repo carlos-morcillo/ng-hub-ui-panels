@@ -74,6 +74,7 @@ The components are standalone — import them directly where you use them:
 import {
 	PanelsComponent,
 	PanelComponent,
+	HubTabNavComponent,
 	PanelHeadingDirective,
 	PanelHeaderDirective,
 	PanelFooterDirective
@@ -105,6 +106,7 @@ its own.
 ## 🎯 Features
 
 - **Four visualizations** — `tabs`, `pills`, `accordion` and `card`, switched with a single `type` input.
+- **Lightweight value-bound strip** — `<hub-tab-nav>` is a content-less, controlled tab strip: it emits the selected `value` from a plain `items` array and lets you render the view yourself (segmented controls, filter switches, tabs with external content).
 - **Card layout & standalone** — `type="card"` renders every panel as an always-visible card; a single `<hub-panel>` also works on its own, outside any container.
 - **Content header/footer slots** — `hubPanelHeader` and `hubPanelFooter` mark header/footer bands that render in every view (distinct from the `hubPanelHeading` nav label).
 - **Semantic alerts** — `appearance="alert"` with a `variant` turns a panel into a themed callout (`role="alert"`) driven by the design-system semantic tokens, no per-colour CSS.
@@ -201,6 +203,29 @@ card by itself:
 > `hubPanelHeader` / `hubPanelFooter` are content bands inside the panel body and
 > render in **every** view. They are different from `hubPanelHeading`, which is the
 > navigational tab label / accordion disclosure button.
+
+#### Card slots — `variant`, `flush`, `fill`
+
+A plain card exposes three inputs:
+
+- **`variant`** — tints the whole card — background / text / border **and the `hubPanelHeader` / `hubPanelFooter` bands** (a slightly stronger tint of the same accent) — from a single semantic accent (`primary` … `neutral`, or any custom colour), with the same `color-mix` model the alert uses (no colour values added). `--hub-panels-card-border-style` sets the frame style, e.g. `dashed` for an empty-state card.
+- **`flush`** — removes the card body padding so it can host a table / list / media block edge-to-edge.
+- **`fill`** — makes the card fill its parent's height and its body scroll, so an inner `flex: 1` region is finally bounded. `--hub-panels-body-gap` spaces stacked body children.
+
+> **Two different `flush` inputs.** `<hub-panel flush>` (this one) zeroes the **card body padding** so projected content touches the card's inner edges. `<hub-panels flush>` is a separate input on the **container** that, in the accordion view, strips the accordion's **outer chrome** (side borders + radius). Different element, different view, different effect — they never collide.
+
+```html
+<hub-panel variant="success"><div hubPanelHeader>Success</div> Tinted card.</hub-panel>
+
+<hub-panel flush>
+	<div hubPanelHeader>Flush</div>
+	<div>Runs edge-to-edge to the card sides.</div>
+</hub-panel>
+
+<div style="height: 240px; display: flex;">
+	<hub-panel fill style="flex: 1;"> …long, scrolling content… </hub-panel>
+</div>
+```
 
 ### Alerts
 
@@ -355,6 +380,10 @@ the active panel follows the current URL (`tabs` / `pills` views only).
 | Input | Type | Default | Description |
 | --- | --- | --- | --- |
 | `heading` | `string` | `undefined` | Plain-text header (ignored when a `hubPanelHeading` template is present). |
+| `variant` | `HubSemanticColor \| string` | `undefined` | Card only: tints the whole card from one semantic accent (reflected as `data-variant`). |
+| `flush` | `boolean` | `false` | Card only: removes the body padding for edge-to-edge content. |
+| `fill` | `boolean` | `false` | Card only: fills the parent's height and scrolls the body. |
+| `standalone` | attribute | — | Static attribute: opts a loose `<hub-panel>` OUT of an ancestor `<hub-panels>` so it renders as a plain card. |
 | `id` | `string` | auto | ARIA pairing id. |
 | `value` | `unknown` | `id` | Value contributed to the form control. |
 | `active` | `boolean` (model) | `false` | Two-way active/expanded state. |
@@ -372,6 +401,27 @@ the active panel follows the current URL (`tabs` / `pills` views only).
 | `selectPanel` | `PanelComponent` | Emitted when the panel becomes active. |
 | `deselectPanel` | `PanelComponent` | Emitted when the panel stops being active. |
 | `removed` | `PanelComponent` | Emitted on removal (✕ or Delete). |
+
+### `<hub-tab-nav>` — lightweight value-bound strip
+
+A content-less, controlled tab strip. It renders the header row only and emits the
+selected `value`; the consumer renders the active view itself.
+
+```html
+<hub-tab-nav [items]="tabs" [(active)]="selected" appearance="pills" />
+```
+
+| Input | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `HubTabNavItem[]` | `[]` | The selectable tabs (`{ value, label, disabled?, id? }`). |
+| `active` | `unknown` (model) | `undefined` | Two-way selected value; `activeChange` fires on change. |
+| `appearance` | `'tabs' \| 'pills'` | `'tabs'` | Underlined tabs or rounded pills. |
+| `justified` | `boolean` | `false` | Stretches tabs to equal width. |
+| `vertical` | `boolean` | `false` | Stacks the strip vertically. |
+
+| Output | Payload | Description |
+| --- | --- | --- |
+| `activeChange` | `unknown` | Emitted with the new value when the selected tab changes. |
 
 ### Directives
 

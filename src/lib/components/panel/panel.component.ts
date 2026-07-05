@@ -67,12 +67,15 @@ let nextPanelId = 0;
 		'[attr.id]': 'accordionView() || cardView() ? null : id()',
 		'[attr.role]': "alertView() ? 'alert' : (accordionView() || cardView() ? null : 'tabpanel')",
 		'[attr.aria-labelledby]': "accordionView() || cardView() ? null : id() + '-link'",
-		'[attr.data-variant]': 'alertView() ? (variant() ?? null) : null',
+		'[attr.data-variant]': 'cardView() ? (variant() ?? null) : null',
 		'[style.--hub-panels-alert-accent]': 'alertAccent()',
+		'[style.--hub-panels-card-accent]': 'cardAccent()',
 		'[class.hub-panels__panel--active]': 'active()',
 		'[class.hub-panels__panel--accordion]': 'accordionView()',
 		'[class.hub-panels__panel--card]': 'cardView() && !alertView()',
-		'[class.hub-panels__panel--alert]': 'alertView()'
+		'[class.hub-panels__panel--alert]': 'alertView()',
+		'[class.hub-panels__panel--fill]': 'fill()',
+		'[class.hub-panels__panel--flush]': 'flush()'
 	}
 })
 export class PanelComponent implements OnDestroy {
@@ -86,8 +89,25 @@ export class PanelComponent implements OnDestroy {
 	 * Owning panels container, or `null` when the panel is used standalone
 	 * (outside any `<hub-panels>`), in which case it renders as a card.
 	 * Exposed to the template for the accordion header.
+	 *
+	 * Resolved with `host: true`, so a panel only binds to a group declared in
+	 * the SAME template (its direct container). Without the host boundary the
+	 * lookup walks the whole ancestor injector tree, and a standalone panel
+	 * inside a component projected into a tab pane would register itself as a
+	 * hidden tab of the outer group instead of rendering as a card.
 	 */
-	protected readonly tabset = inject(PanelsComponent, { optional: true });
+	protected readonly tabset = inject(PanelsComponent, { optional: true, host: true });
+
+	/**
+	 * Opts a standalone `<hub-panel>` OUT of an ancestor `<hub-panels>` group so it
+	 * renders as a plain card even when nested inside a tabs / pills / accordion
+	 * container (otherwise hierarchical DI would capture it as a hidden 0×0 tab).
+	 *
+	 * Must be a STATIC attribute (`<hub-panel standalone>`): the opt-out is decided
+	 * when the panel is created — before dynamic inputs are applied — so it is read
+	 * from the host attribute rather than a reactive input.
+	 */
+	readonly standalone = this.elementRef.nativeElement.hasAttribute('standalone');
 
 	/** Plain-text panel header. Ignored when a `hubPanelHeading` template exists. */
 	readonly heading = input<string | undefined>(undefined);
@@ -109,6 +129,21 @@ export class PanelComponent implements OnDestroy {
 	 * alert.
 	 */
 	readonly variant = input<HubPanelVariant | (string & {}) | undefined>(undefined);
+
+	/**
+	 * Makes a card panel fill its parent's height and lets an inner scroll region
+	 * work: the host, both content wrappers and the body become a flex column
+	 * (`flex: 1; min-height: 0`) and the body scrolls. Opt-in; off by default so
+	 * existing layouts are byte-identical. Card view only.
+	 */
+	readonly fill = input(false, { transform: booleanAttribute });
+
+	/**
+	 * Removes the card body padding (`--hub-panels-card-padding-x/-y` → 0) so a card
+	 * can host a flush element (a table, a list, a media block) edge-to-edge. Opt-in;
+	 * card view only.
+	 */
+	readonly flush = input(false, { transform: booleanAttribute });
 
 	/**
 	 * Unique id used for the `tab` / `tabpanel` (or accordion header / region)
@@ -159,13 +194,13 @@ export class PanelComponent implements OnDestroy {
 	readonly headingRef = signal<TemplateRef<unknown> | undefined>(undefined);
 
 	/** Whether the owning container renders the accordion visualization. */
-	protected readonly accordionView = computed(() => this.tabset?.isAccordionView() ?? false);
+	protected readonly accordionView = computed(() => !this.standalone && (this.tabset?.isAccordionView() ?? false));
 
 	/**
 	 * Whether this panel renders as a card: either inside a `<hub-panels
 	 * type="card">` container or standalone (no owning container at all).
 	 */
-	protected readonly cardView = computed(() => !this.tabset || this.tabset.isCardView());
+	protected readonly cardView = computed(() => this.standalone || !this.tabset || this.tabset.isCardView());
 
 	/**
 	 * Whether this panel renders as a semantic alert: `appearance="alert"` while
@@ -185,6 +220,17 @@ export class PanelComponent implements OnDestroy {
 		return this.alertView() && variant ? `var(--hub-sys-color-${variant})` : null;
 	});
 
+	/**
+	 * Inline accent fed to the card variant tint: `var(--hub-sys-color-<variant>)`
+	 * for a plain (non-alert) card carrying a `variant`, else `null`. Mirrors
+	 * {@link alertAccent}, keeping the card variant set open with no colour values
+	 * living in this library.
+	 */
+	protected readonly cardAccent = computed(() => {
+		const variant = this.variant();
+		return this.cardView() && !this.alertView() && variant ? `var(--hub-sys-color-${variant})` : null;
+	});
+
 	/** Form value resolved for this panel: the explicit `value` or the panel id. */
 	readonly formValue = computed(() => (this.value() !== undefined ? this.value() : this.id()));
 
@@ -201,8 +247,11 @@ export class PanelComponent implements OnDestroy {
 	#wasActive = false;
 
 	constructor() {
-		// Standalone panels (no container) render as a card and skip registration.
-		this.tabset?.registerPanel(this);
+		// A standalone panel (no container, or explicitly `standalone` inside one)
+		// renders as a card and skips registration so it never becomes a hidden tab.
+		if (!this.standalone) {
+			this.tabset?.registerPanel(this);
+		}
 
 		// Mirror `customClass` onto the pane host element.
 		effect((onCleanup) => {
@@ -248,7 +297,9 @@ export class PanelComponent implements OnDestroy {
 	}
 
 	ngOnDestroy(): void {
-		this.tabset?.removePanel(this, { reselect: false, emit: false });
+		if (!this.standalone) {
+			this.tabset?.removePanel(this, { reselect: false, emit: false });
+		}
 	}
 
 	/** Route path plus query string, or `null` when the panel is not routed. */

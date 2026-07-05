@@ -1,0 +1,161 @@
+// ─────────────────────────────────────────────────────────────────────────
+// `<hub-tab-nav>` — lightweight, content-less value-bound tab strip
+// ─────────────────────────────────────────────────────────────────────────
+//
+// Reuses the `<hub-panels>` strip look by consuming the same public
+// `--hub-panels-*` tokens (inherited when nested in a themed panels subtree,
+// literal fallbacks otherwise), plus two strip-local tokens declared below.
+// Owns NO content — it renders only the header row.
+//
+// ViewEncapsulation.None: every rule stays namespaced under `.hub-tab-nav*`.
+// ─────────────────────────────────────────────────────────────────────────
+
+:where(.hub-tab-nav) {
+	// Strip-local tokens (see docs/css-variables-reference.md).
+	// Colour of the active-tab underline (tabs) / active-pill fill (pills).
+	--hub-tabs-indicator-color: var(--hub-panels-accent, var(--hub-sys-color-primary, #0d6efd));
+	// Gap between tabs. `0` for the underlined tabs, re-based for the pills row.
+	--hub-tabs-gap: 0;
+
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.hub-tab-nav {
+	&,
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	&--vertical {
+		display: block;
+	}
+
+	&__nav {
+		display: flex;
+		flex-wrap: nowrap;
+		gap: var(--hub-tabs-gap);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+
+		&--tabs {
+			border-bottom: var(--hub-panels-border-width, 1px) solid var(--hub-panels-border-color, #dee2e6);
+		}
+
+		&--pills {
+			--hub-tabs-gap: var(--hub-panels-pill-gap, 0.5rem);
+		}
+
+		&--justified {
+			flex: 1 1 auto;
+
+			.hub-tab-nav__nav-item {
+				flex: 1 1 0;
+			}
+
+			.hub-tab-nav__nav-link {
+				width: 100%;
+				justify-content: center;
+			}
+		}
+
+		&--vertical {
+			flex-direction: column;
+
+			&.hub-tab-nav__nav--tabs {
+				border-bottom: 0;
+				border-inline-end: var(--hub-panels-border-width, 1px) solid var(--hub-panels-border-color, #dee2e6);
+			}
+		}
+	}
+
+	&__nav-item {
+		display: flex;
+		flex: 0 0 auto;
+	}
+
+	&__nav-link {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		gap: var(--hub-panels-tab-gap, 0.5rem);
+		padding: var(--hub-panels-tab-padding-y, 0.5rem) var(--hub-panels-tab-padding-x, 1rem);
+		font-family: var(--hub-panels-tab-font-family, inherit);
+		font-size: var(--hub-panels-tab-font-size, 1rem);
+		font-weight: var(--hub-panels-tab-font-weight, 500);
+		line-height: var(--hub-panels-tab-line-height, 1.5);
+		white-space: nowrap;
+		color: var(--hub-panels-tab-color, #212529);
+		background: var(--hub-panels-tab-bg, transparent);
+		border: var(--hub-panels-tab-border-width, 1px) solid transparent;
+		border-start-start-radius: var(--hub-panels-tab-border-radius, 0.375rem);
+		border-start-end-radius: var(--hub-panels-tab-border-radius, 0.375rem);
+		cursor: pointer;
+		transition: var(--hub-panels-tab-transition, all 0.2s ease-in-out);
+
+		&:hover:not(:disabled):not(.hub-tab-nav__nav-link--active) {
+			color: var(--hub-panels-nav-link-hover-color, var(--hub-panels-accent-emphasis, #0a58ca));
+			background: var(--hub-panels-tab-bg-hover, #f8f9fa);
+		}
+
+		&:focus-visible {
+			z-index: 1;
+			outline: 0;
+			box-shadow: 0 0 0 var(--hub-panels-tab-focus-ring-width, 0.25rem)
+				var(--hub-panels-tab-focus-ring-color, rgba(13, 110, 253, 0.25));
+		}
+
+		&--active {
+			color: var(--hub-panels-nav-link-active-color, var(--hub-tabs-indicator-color));
+		}
+
+		&:disabled {
+			color: var(--hub-panels-tab-color-disabled, #6c757d);
+			background: transparent;
+			cursor: not-allowed;
+		}
+	}
+
+	// ── Underlined `tabs` indicator ──────────────────────────────────────
+	&__nav--tabs {
+		.hub-tab-nav__nav-link {
+			// Overlap the strip border so the active underline paints over it.
+			margin-bottom: calc(-1 * var(--hub-panels-border-width, 1px));
+			border-bottom: 2px solid transparent;
+		}
+
+		.hub-tab-nav__nav-link--active {
+			border-bottom-color: var(--hub-tabs-indicator-color);
+		}
+
+		&.hub-tab-nav__nav--vertical {
+			.hub-tab-nav__nav-link {
+				margin-bottom: 0;
+				margin-inline-end: calc(-1 * var(--hub-panels-border-width, 1px));
+				border-bottom: var(--hub-panels-tab-border-width, 1px) solid transparent;
+				border-inline-end: 2px solid transparent;
+			}
+
+			.hub-tab-nav__nav-link--active {
+				border-inline-end-color: var(--hub-tabs-indicator-color);
+			}
+		}
+	}
+
+	// ── `pills` indicator ────────────────────────────────────────────────
+	&__nav--pills {
+		.hub-tab-nav__nav-link {
+			border-radius: var(--hub-panels-pill-border-radius, 50rem);
+		}
+
+		.hub-tab-nav__nav-link--active {
+			color: var(--hub-panels-pill-color-active, #fff);
+			background: var(--hub-panels-pill-bg-active, var(--hub-tabs-indicator-color));
+			border-color: transparent;
+		}
+	}
+}

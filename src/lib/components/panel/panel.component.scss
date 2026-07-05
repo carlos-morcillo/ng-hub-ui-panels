@@ -16,39 +16,80 @@
 	--hub-panels-card-bg: var(--hub-sys-surface-page, #fff);
 	--hub-panels-card-color: var(--hub-sys-text-primary, #212529);
 	--hub-panels-card-border-width: var(--hub-ref-border-width, 1px);
+	--hub-panels-card-border-style: solid;
 	--hub-panels-card-border-color: var(--hub-sys-border-color-default, #dee2e6);
 	--hub-panels-card-border-radius: var(--hub-ref-radius-md, 0.375rem);
-	--hub-panels-card-box-shadow: var(--hub-sys-shadow-sm, 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075));
+	// Local accent slot for the semantic card tint (mirrors the alert). Set inline
+	// to `var(--hub-sys-color-<variant>)` by the component when `[variant]` is present.
+	--hub-panels-card-accent: var(--hub-sys-border-color-default, #dee2e6);
 	--hub-panels-card-padding-x: var(--hub-ref-space-4, 1.5rem);
 	--hub-panels-card-padding-y: var(--hub-ref-space-3, 1rem);
+	// Gap between stacked children when the body is a flex column (`fill`). No-op otherwise.
+	--hub-panels-body-gap: 0;
+	// NOTE: `--hub-panels-card-box-shadow` is intentionally NOT declared here — it is
+	// consumed with its default as a `var()` fallback at the usage site so an ancestor
+	// (a page shell) can set it and have it inherit through to the card.
 }
 
 :where(.hub-panels__panel-header, .hub-panels__panel-footer) {
-	--hub-panels-panel-header-bg: var(--hub-sys-surface-elevated, #f8f9fa);
+	// NOTE: `--hub-panels-panel-header-bg` is intentionally NOT declared here — see the
+	// card box-shadow note above; the default lives in the usage-site `var()` fallback
+	// so a region ancestor can re-tint the header/footer band via inheritance.
 	--hub-panels-panel-header-color: var(--hub-sys-text-primary, #212529);
 	--hub-panels-panel-header-padding-x: var(--hub-ref-space-4, 1.5rem);
 	--hub-panels-panel-header-padding-y: var(--hub-ref-space-3, 1rem);
 	--hub-panels-panel-header-font-weight: var(--hub-ref-font-weight-semibold, 600);
 	--hub-panels-panel-header-border-width: var(--hub-ref-border-width, 1px);
 	--hub-panels-panel-header-border-color: var(--hub-sys-border-color-default, #dee2e6);
+	// Content layout of the header / footer band (icon + title + actions). Mirrors
+	// the alert body's content-layout tokens so a consumer re-flows it (column,
+	// centered, different spacing…) with NO custom CSS — the band is a flex row by
+	// default. Header packs content to the start; footer packs actions to the end
+	// (set per band below). A trailing header child / leading footer child floats
+	// to the far edge (the canonical "title left · actions right" card flow).
+	--hub-panels-panel-header-content-direction: row;
+	--hub-panels-panel-header-content-align: center;
+	--hub-panels-panel-header-content-justify: flex-start;
+	--hub-panels-panel-footer-content-justify: flex-end;
+	--hub-panels-panel-header-content-gap: var(--hub-sys-gap-3, 0.75rem);
 }
 
 // ── Content header / footer bands (all views) ────────────────────────────
 .hub-panels__panel-header {
-	display: block;
+	display: flex;
+	flex-direction: var(--hub-panels-panel-header-content-direction);
+	align-items: var(--hub-panels-panel-header-content-align);
+	justify-content: var(--hub-panels-panel-header-content-justify);
+	gap: var(--hub-panels-panel-header-content-gap);
 	padding: var(--hub-panels-panel-header-padding-y) var(--hub-panels-panel-header-padding-x);
 	color: var(--hub-panels-panel-header-color);
-	background: var(--hub-panels-panel-header-bg);
+	background: var(--hub-panels-panel-header-bg, var(--hub-sys-surface-elevated, #f8f9fa));
 	font-weight: var(--hub-panels-panel-header-font-weight);
 	border-bottom: var(--hub-panels-panel-header-border-width) solid var(--hub-panels-panel-header-border-color);
+
+	// Canonical card-header flow: a trailing action (status badge / buttons)
+	// floats to the far edge, so "title · actions" needs no per-consumer CSS.
+	> :last-child:not(:only-child) {
+		margin-inline-start: auto;
+	}
 }
 
 .hub-panels__panel-footer {
-	display: block;
+	display: flex;
+	flex-direction: var(--hub-panels-panel-header-content-direction);
+	align-items: var(--hub-panels-panel-header-content-align);
+	justify-content: var(--hub-panels-panel-footer-content-justify);
+	gap: var(--hub-panels-panel-header-content-gap);
 	padding: var(--hub-panels-panel-header-padding-y) var(--hub-panels-panel-header-padding-x);
 	color: var(--hub-panels-panel-header-color);
-	background: var(--hub-panels-panel-header-bg);
+	background: var(--hub-panels-panel-header-bg, var(--hub-sys-surface-elevated, #f8f9fa));
 	border-top: var(--hub-panels-panel-header-border-width) solid var(--hub-panels-panel-header-border-color);
+
+	// Canonical card-footer flow: leading meta (e.g. a timestamp) floats to the
+	// start while the actions stay at the end (meta · actions).
+	> :first-child:not(:only-child) {
+		margin-inline-end: auto;
+	}
 }
 
 // ── Card frame ───────────────────────────────────────────────────────────
@@ -60,15 +101,47 @@
 	flex-direction: column;
 	color: var(--hub-panels-card-color);
 	background: var(--hub-panels-card-bg);
-	border: var(--hub-panels-card-border-width) solid var(--hub-panels-card-border-color);
+	border: var(--hub-panels-card-border-width) var(--hub-panels-card-border-style) var(--hub-panels-card-border-color);
 	border-radius: var(--hub-panels-card-border-radius);
-	box-shadow: var(--hub-panels-card-box-shadow);
+	box-shadow: var(--hub-panels-card-box-shadow, var(--hub-sys-shadow-sm, 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)));
 	overflow: hidden; // clip the header/footer bands to the rounded corners
 
 	// Card body padding (only in card view; in strip/accordion views the
 	// container/accordion supplies the content padding).
 	.hub-panels__panel-body {
 		padding: var(--hub-panels-card-padding-y) var(--hub-panels-card-padding-x);
+	}
+}
+
+// ── Flush card — zero body padding (`<hub-panel flush>`) ──────────────────
+// Replaces the per-site inline `--hub-panels-card-padding-*: 0` overrides.
+.hub-panels__panel--flush {
+	--hub-panels-card-padding-x: 0;
+	--hub-panels-card-padding-y: 0;
+}
+
+// ── Fill card — grows to the parent's height and lets the body scroll, so an
+// inner `flex: 1; min-height: 0` region (e.g. a tab strip + scroll pane) is
+// finally bounded (`<hub-panel fill>`). The parent must be a flex column. ───
+.hub-panels__panel--card.hub-panels__panel--fill {
+	flex: 1 1 auto;
+	min-height: 0;
+
+	.hub-panels__panel-collapse,
+	.hub-panels__panel-region {
+		display: flex;
+		flex-direction: column;
+		flex: 1 1 auto;
+		min-height: 0;
+	}
+
+	.hub-panels__panel-body {
+		flex: 1 1 auto;
+		min-height: 0;
+		overflow: auto;
+		display: flex;
+		flex-direction: column;
+		gap: var(--hub-panels-body-gap);
 	}
 }
 
@@ -109,8 +182,11 @@
 // consumer with a custom accent palette (e.g. `variant="brand"` backed by
 // `--hub-sys-color-brand`) interconnects with zero per-colour CSS in this file.
 :where(.hub-panels__panel--alert[data-variant]) {
-	--hub-panels-alert-bg: color-mix(in oklch, var(--hub-panels-alert-accent) 14%, var(--hub-sys-surface-page, #fff));
-	--hub-panels-alert-color: color-mix(in oklch, var(--hub-panels-alert-accent) 72%, var(--hub-sys-text-primary, #212529));
+	// Canonical design-system derivations (subtle / emphasis) from the single
+	// accent slot — same tints the ds `--hub-sys-color-*-subtle/-emphasis`
+	// families ship, so a custom variant renders exactly like a built-in.
+	--hub-panels-alert-bg: color-mix(in oklch, var(--hub-panels-alert-accent) 12%, var(--hub-sys-surface-page, #ffffff));
+	--hub-panels-alert-color: color-mix(in oklch, var(--hub-panels-alert-accent) 80%, var(--hub-sys-color-ink, #212529));
 	--hub-panels-alert-border-color: color-mix(in oklch, var(--hub-panels-alert-accent) 30%, transparent);
 }
 
@@ -135,6 +211,41 @@ $hub-alert-variants: primary, secondary, success, danger, warning, info, neutral
 @each $variant in $hub-alert-variants {
 	:where(.hub-panels__panel--alert[data-variant='#{$variant}']) {
 		@include hub-panels-alert-variant($variant);
+	}
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Card semantic variant tint — `<hub-panel [variant]="…">` on a plain card
+// ─────────────────────────────────────────────────────────────────────────
+//
+// Mirrors the alert exactly: the card owns NO colour values. A single inline
+// accent (`--hub-panels-card-accent`, set by the component to
+// `var(--hub-sys-color-<variant>)`) drives the open color-mix derivation, and
+// the built-in variants pick up the exact ds tints. Declared AFTER the base card
+// token block so it wins (both are zero-specificity `:where`).
+:where(.hub-panels__panel--card[data-variant]) {
+	--hub-panels-card-bg: color-mix(in oklch, var(--hub-panels-card-accent) 12%, var(--hub-sys-surface-page, #ffffff));
+	--hub-panels-card-color: color-mix(in oklch, var(--hub-panels-card-accent) 80%, var(--hub-sys-color-ink, #212529));
+	--hub-panels-card-border-color: color-mix(in oklch, var(--hub-panels-card-accent) 30%, transparent);
+}
+
+// The header / footer bands follow the variant too — a slightly stronger tint
+// than the body so they still read as bands, the label in the variant's emphasis
+// tone and a divider matching the card frame. Declared ON the band elements (not
+// the host) so they override the neutral defaults the bands set on themselves.
+// Same accent, so a custom variant colours the whole card exactly like a built-in.
+:where(.hub-panels__panel--card[data-variant]) :where(.hub-panels__panel-header, .hub-panels__panel-footer) {
+	--hub-panels-panel-header-bg: color-mix(in oklch, var(--hub-panels-card-accent) 22%, var(--hub-sys-surface-page, #ffffff));
+	--hub-panels-panel-header-color: color-mix(in oklch, var(--hub-panels-card-accent) 85%, var(--hub-sys-color-ink, #212529));
+	--hub-panels-panel-header-border-color: color-mix(in oklch, var(--hub-panels-card-accent) 40%, transparent);
+}
+
+// Built-in semantic variants — exact ds tints (same variant list as the alert).
+@each $variant in $hub-alert-variants {
+	:where(.hub-panels__panel--card[data-variant='#{$variant}']) {
+		--hub-panels-card-bg: var(--hub-sys-color-#{$variant}-subtle);
+		--hub-panels-card-color: var(--hub-sys-color-#{$variant}-emphasis);
+		--hub-panels-card-border-color: var(--hub-sys-color-#{$variant}-border-subtle);
 	}
 }
 
