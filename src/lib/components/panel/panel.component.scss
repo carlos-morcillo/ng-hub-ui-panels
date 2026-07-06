@@ -234,8 +234,11 @@ $hub-alert-variants: primary, secondary, success, danger, warning, info, neutral
 // tone and a divider matching the card frame. Declared ON the band elements (not
 // the host) so they override the neutral defaults the bands set on themselves.
 // Same accent, so a custom variant colours the whole card exactly like a built-in.
+// The band background is set directly (not through `--hub-panels-panel-header-bg`,
+// which is intentionally left undeclared so an ancestor can re-tint the band via
+// inheritance) so a scoped variant tint never masquerades as the token default.
 :where(.hub-panels__panel--card[data-variant]) :where(.hub-panels__panel-header, .hub-panels__panel-footer) {
-	--hub-panels-panel-header-bg: color-mix(in oklch, var(--hub-panels-card-accent) 22%, var(--hub-sys-surface-page, #ffffff));
+	background: color-mix(in oklch, var(--hub-panels-card-accent) 22%, var(--hub-sys-surface-page, #ffffff));
 	--hub-panels-panel-header-color: color-mix(in oklch, var(--hub-panels-card-accent) 85%, var(--hub-sys-color-ink, #212529));
 	--hub-panels-panel-header-border-color: color-mix(in oklch, var(--hub-panels-card-accent) 40%, transparent);
 }
