@@ -5,6 +5,16 @@ All notable changes to the ng-hub-ui-panels library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [22.6.0] - 2026-07-07
+
+### Added
+
+- **`hub-panels-theme(...)` SCSS mixin** — one-call token theming for `<hub-panels>`. `$accent` feeds the single `--hub-panels-accent` slot (the component derives the `-emphasis` / `-subtle` / `-on` family from it), alongside the panel surface (`$border-color`, `$border-radius`, `$border-width`, `$content-bg`, `$content-padding-x/y`) and the tab appearance (`$tab-bg-active`, `$tab-color-active`, `$tab-font-size`, `$tab-padding-x/y`, `$nav-gap`). Every parameter is null-defaulted and additive; for any token not exposed, set the `--hub-panels-*` custom property directly.
+
+### Changed
+
+- **Packaging — the library now ships its SCSS at `/styles`.** `src/lib/styles` is emitted to `dist/panels/styles`, exposing `hub-panels-theme` as a first-class package entry: `@use 'ng-hub-ui-panels/styles' as *;`.
+
 ## [22.5.0] - 2026-07-07
 
 ### Changed

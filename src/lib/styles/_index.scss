@@ -1,0 +1,6 @@
+// ── Public SCSS API for ng-hub-ui-panels ─────────────────────────────────────
+//
+//   @use 'ng-hub-ui-panels/styles' as *;
+//
+// Forwards the `hub-panels-theme(...)` one-call theming mixin.
+@forward 'panels-theme';

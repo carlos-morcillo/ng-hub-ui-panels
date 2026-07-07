@@ -1,0 +1,80 @@
+// ─────────────────────────────────────────────────────────────────────────
+// hub-panels-theme — one-call token theming for `<hub-panels>`
+// ─────────────────────────────────────────────────────────────────────────
+//
+// Override the most useful `--hub-panels-*` design tokens in a single include. Every
+// parameter is OPTIONAL and defaults to `null`: only the parameters you pass are
+// emitted, so the rest keep their defaults. For any token not exposed here, set the
+// `--hub-panels-*` custom property directly — this mixin is sugar for the common knobs,
+// not a replacement for the full token surface.
+//
+// `$accent` feeds the single `--hub-panels-accent` slot; the component derives the
+// `-emphasis` / `-subtle` / `-on` family from it at runtime, so one colour re-tones the
+// active tab and accents. Pass any value `resolveHubAccent` accepts (a semantic name, a
+// registered accent, or a literal `#hex` / `rgb()` / `oklch()`).
+//
+// @example
+//
+//   @use 'ng-hub-ui-panels/styles' as *;
+//
+//   .settings {
+//       @include hub-panels-theme($accent: var(--hub-sys-color-brand), $border-radius: 0.75rem);
+//   }
+//
+// scss-docs-start hub-panels-theme
+@mixin hub-panels-theme(
+	$accent: null,             // --hub-panels-accent (active tab + accents)
+	$border-color: null,       // --hub-panels-border-color
+	$border-radius: null,      // --hub-panels-border-radius
+	$border-width: null,       // --hub-panels-border-width
+	$content-bg: null,         // --hub-panels-content-bg (pane surface)
+	$content-padding-x: null,  // --hub-panels-content-padding-x
+	$content-padding-y: null,  // --hub-panels-content-padding-y
+	$tab-bg-active: null,      // --hub-panels-tab-bg-active
+	$tab-color-active: null,   // --hub-panels-tab-color-active
+	$tab-font-size: null,      // --hub-panels-tab-font-size
+	$tab-padding-x: null,      // --hub-panels-tab-padding-x
+	$tab-padding-y: null,      // --hub-panels-tab-padding-y
+	$nav-gap: null             // --hub-panels-nav-gap (spacing between tabs)
+) {
+	@if $accent != null {
+		--hub-panels-accent: #{$accent};
+	}
+	@if $border-color != null {
+		--hub-panels-border-color: #{$border-color};
+	}
+	@if $border-radius != null {
+		--hub-panels-border-radius: #{$border-radius};
+	}
+	@if $border-width != null {
+		--hub-panels-border-width: #{$border-width};
+	}
+	@if $content-bg != null {
+		--hub-panels-content-bg: #{$content-bg};
+	}
+	@if $content-padding-x != null {
+		--hub-panels-content-padding-x: #{$content-padding-x};
+	}
+	@if $content-padding-y != null {
+		--hub-panels-content-padding-y: #{$content-padding-y};
+	}
+	@if $tab-bg-active != null {
+		--hub-panels-tab-bg-active: #{$tab-bg-active};
+	}
+	@if $tab-color-active != null {
+		--hub-panels-tab-color-active: #{$tab-color-active};
+	}
+	@if $tab-font-size != null {
+		--hub-panels-tab-font-size: #{$tab-font-size};
+	}
+	@if $tab-padding-x != null {
+		--hub-panels-tab-padding-x: #{$tab-padding-x};
+	}
+	@if $tab-padding-y != null {
+		--hub-panels-tab-padding-y: #{$tab-padding-y};
+	}
+	@if $nav-gap != null {
+		--hub-panels-nav-gap: #{$nav-gap};
+	}
+}
+// scss-docs-end hub-panels-theme
