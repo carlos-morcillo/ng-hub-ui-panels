@@ -79,6 +79,13 @@ class AlertInTabsHost {}
 class CustomVariantAlertHost {}
 
 @Component({
+	standalone: true,
+	imports: [PanelComponent],
+	template: `<hub-panel appearance="alert" variant="#ff0000">Literal accent</hub-panel>`
+})
+class LiteralVariantAlertHost {}
+
+@Component({
 	selector: 'spec-nested-feature',
 	standalone: true,
 	imports: [PanelComponent],
@@ -231,7 +238,7 @@ describe('panels card view + content header/footer slots', () => {
 			fixture.detectChanges();
 
 			const success = fixture.nativeElement.querySelector('.hub-panels__panel--alert[data-variant=success]') as HTMLElement;
-			expect(success.style.getPropertyValue('--hub-panels-alert-accent')).toBe('var(--hub-sys-color-success)');
+			expect(success.style.getPropertyValue('--hub-panels-alert-accent')).toBe('var(--hub-sys-color-success, success)');
 		});
 
 		it('supports an arbitrary custom variant (open accent palette)', () => {
@@ -240,7 +247,15 @@ describe('panels card view + content header/footer slots', () => {
 
 			const el = fixture.nativeElement.querySelector('.hub-panels__panel--alert') as HTMLElement;
 			expect(el.getAttribute('data-variant')).toBe('brand');
-			expect(el.style.getPropertyValue('--hub-panels-alert-accent')).toBe('var(--hub-sys-color-brand)');
+			expect(el.style.getPropertyValue('--hub-panels-alert-accent')).toBe('var(--hub-sys-color-brand, brand)');
+		});
+
+		it('passes a literal colour variant through unchanged', () => {
+			const fixture = TestBed.createComponent(LiteralVariantAlertHost);
+			fixture.detectChanges();
+
+			const el = fixture.nativeElement.querySelector('.hub-panels__panel--alert') as HTMLElement;
+			expect(el.style.getPropertyValue('--hub-panels-alert-accent')).toBe('#ff0000');
 		});
 
 		it('ignores the alert appearance inside a strip view (tabs)', () => {

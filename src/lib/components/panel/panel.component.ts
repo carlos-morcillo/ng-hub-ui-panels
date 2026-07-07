@@ -19,6 +19,7 @@ import {
 import { Params, Router } from '@angular/router';
 
 import { HubPanelAppearance, HubPanelVariant } from '../../models/panels.types';
+import { resolveHubAccent } from '../../utils/resolve-hub-accent';
 import { PanelsComponent } from '../panels/panels.component';
 
 /** Monotonic counter backing the auto-generated accessibility ids. */
@@ -210,25 +211,33 @@ export class PanelComponent implements OnDestroy {
 	protected readonly alertView = computed(() => this.appearance() === 'alert' && this.cardView());
 
 	/**
-	 * Inline accent fed to the alert styles: `var(--hub-sys-color-<variant>)` for
-	 * the active variant, or `null` for a neutral alert / non-alert view. This is
-	 * what makes the variant set open — any accent token defined by the host
-	 * application is picked up without the library knowing the variant name.
+	 * Inline accent fed to the alert styles, resolved from the `variant` input so
+	 * ANY colour works. A bareword (a semantic name, a registered accent or a CSS
+	 * named colour) resolves to `var(--hub-sys-color-<variant>, <variant>)` — the
+	 * design-system token with the word itself as the raw fallback; a literal
+	 * (`#hex` / `rgb()` / `oklch()` / `var()`) is passed through unchanged. Returns
+	 * `null` for a neutral alert / non-alert view. The built-in semantic variants
+	 * additionally pick up their exact ds tints through the SCSS `@each`.
 	 */
 	protected readonly alertAccent = computed(() => {
-		const variant = this.variant();
-		return this.alertView() && variant ? `var(--hub-sys-color-${variant})` : null;
+		if (!this.alertView()) {
+			return null;
+		}
+		return resolveHubAccent(this.variant());
 	});
 
 	/**
-	 * Inline accent fed to the card variant tint: `var(--hub-sys-color-<variant>)`
-	 * for a plain (non-alert) card carrying a `variant`, else `null`. Mirrors
-	 * {@link alertAccent}, keeping the card variant set open with no colour values
-	 * living in this library.
+	 * Inline accent fed to the card variant tint, resolved from the `variant` input
+	 * exactly like {@link alertAccent}: a bareword becomes
+	 * `var(--hub-sys-color-<variant>, <variant>)` and a literal colour is passed
+	 * through unchanged. Returns `null` for an alert or non-card view, keeping the
+	 * card variant set open with no colour values living in this library.
 	 */
 	protected readonly cardAccent = computed(() => {
-		const variant = this.variant();
-		return this.cardView() && !this.alertView() && variant ? `var(--hub-sys-color-${variant})` : null;
+		if (!this.cardView() || this.alertView()) {
+			return null;
+		}
+		return resolveHubAccent(this.variant());
 	});
 
 	/** Form value resolved for this panel: the explicit `value` or the panel id. */

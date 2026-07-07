@@ -27,6 +27,7 @@ import type { HubPanelVariant, PanelChangeEvent, PanelsType } from '../../models
 import { PanelsConfig } from '../../services/panels-config.service';
 import { contentBoxWidth } from '../../utils/content-box-width';
 import { readByPath } from '../../utils/read-by-path';
+import { resolveHubAccent } from '../../utils/resolve-hub-accent';
 import type { PanelComponent } from '../panel/panel.component';
 
 interface MultipleHeaderGroup {
@@ -191,15 +192,15 @@ export class PanelsComponent implements ControlValueAccessor {
 	readonly isCardView = computed(() => this.type() === 'card');
 
 	/**
-	 * Inline accent fed to the strip styles: `var(--hub-sys-color-<variant>)` for
-	 * the active variant, or `null` to keep the `primary` default. This is what
-	 * makes the variant set open — any accent token defined by the host
-	 * application is picked up without the library knowing the variant name.
+	 * Inline accent fed to the strip styles, resolved from the `variant` input so
+	 * ANY colour works. A bareword (a semantic name, a registered accent or a CSS
+	 * named colour) resolves to `var(--hub-sys-color-<variant>, <variant>)` — the
+	 * design-system token with the word itself as the raw fallback; a literal
+	 * (`#hex` / `rgb()` / `oklch()` / `var()`) is passed through unchanged. Returns
+	 * `null` to keep the `primary` default. The built-in semantic variants
+	 * additionally pick up their exact ds tints through the SCSS `@each`.
 	 */
-	protected readonly groupAccent = computed(() => {
-		const variant = this.variant();
-		return variant ? `var(--hub-sys-color-${variant})` : null;
-	});
+	protected readonly groupAccent = computed(() => resolveHubAccent(this.variant()));
 
 	/**
 	 * Whether more than one panel may be active at once. Driven by `multiple`

@@ -100,6 +100,26 @@ describe('PanelsComponent', () => {
 		expect(fixture.nativeElement.querySelector('.hub-panels__nav--pills')).toBeTruthy();
 	});
 
+	describe('semantic-or-literal strip accent', () => {
+		it('resolves a semantic variant to its sys token with a raw fallback', () => {
+			const accentFixture = TestBed.createComponent(PanelsComponent);
+			accentFixture.componentRef.setInput('variant', 'primary');
+			accentFixture.detectChanges();
+
+			expect(accentFixture.nativeElement.style.getPropertyValue('--hub-panels-accent')).toBe(
+				'var(--hub-sys-color-primary, primary)'
+			);
+		});
+
+		it('passes a literal colour through unchanged', () => {
+			const accentFixture = TestBed.createComponent(PanelsComponent);
+			accentFixture.componentRef.setInput('variant', '#ff0000');
+			accentFixture.detectChanges();
+
+			expect(accentFixture.nativeElement.style.getPropertyValue('--hub-panels-accent')).toBe('#ff0000');
+		});
+	});
+
 	describe('multiple selection (tabs)', () => {
 		beforeEach(() => {
 			host.multiple = true;
