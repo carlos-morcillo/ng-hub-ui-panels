@@ -399,9 +399,9 @@
 			justify-content: flex-start;
 			margin-bottom: 0;
 			border-start-start-radius: var(--hub-panels-tab-border-radius);
-			border-start-end-radius: 0;
+			border-start-end-radius: var(--hub-panels-tab-border-end-radius, 0);
 			border-end-start-radius: var(--hub-panels-tab-border-radius);
-			border-end-end-radius: 0;
+			border-end-end-radius: var(--hub-panels-tab-border-end-radius, 0);
 			// Overlap the strip's inline-end seam so the active tab can erase it.
 			margin-inline-end: calc(-1 * var(--hub-panels-border-width));
 		}

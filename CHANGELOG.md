@@ -5,6 +5,12 @@ All notable changes to the ng-hub-ui-panels library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [22.7.0] - 2026-07-08
+
+### Added
+
+- **`--hub-panels-tab-border-end-radius` token** — controls the radius of a vertical tab's corners on the edge that meets the panel body (the inline-end corners). Previously those corners were hardcoded to `0`, so the active tab always "docked" flush into the panel and a consumer could not round them. The token **defaults to `0`** (fully backward-compatible — the docking look is unchanged for every existing consumer); raise it (e.g. to `--hub-panels-tab-border-radius`) to render fully-rounded, standalone rail items such as a routed settings/profile subnav. Only `border-start-end-radius` / `border-end-end-radius` on `.hub-panels__nav--vertical .hub-panels__nav-link` changed — from literal `0` to `var(--hub-panels-tab-border-end-radius, 0)`.
+
 ## [22.6.0] - 2026-07-07
 
 ### Added

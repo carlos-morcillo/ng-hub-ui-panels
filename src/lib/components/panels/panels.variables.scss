@@ -68,6 +68,11 @@
 	--hub-panels-tab-border-style: solid;
 	--hub-panels-tab-border-color: transparent;
 	--hub-panels-tab-border-radius: var(--hub-panels-border-radius);
+	// Radius of a tab's corners on the edge that meets the panel body (the
+	// inline-end corners of a VERTICAL tab). Defaults to 0 so the active tab
+	// "docks" flush into the panel; raise it (e.g. to
+	// `--hub-panels-tab-border-radius`) for a fully-rounded, standalone rail item.
+	--hub-panels-tab-border-end-radius: 0;
 	--hub-panels-tab-bg-hover: var(--hub-ref-surface-2, #f8f9fa);
 	--hub-panels-tab-color-hover: var(--hub-panels-nav-link-hover-color);
 	--hub-panels-tab-bg-active: var(--hub-panels-nav-link-active-bg);
