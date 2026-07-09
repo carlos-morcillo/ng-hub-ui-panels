@@ -98,6 +98,37 @@ describe('accordion heading actions', () => {
 
 		expect(header.classList).toContain('hub-panels__accordion-header--expanded');
 	});
+
+	// Two stylesheet rules hang off this DOM shape, and both regressed once when the
+	// button stopped spanning the row: the hairline that closes an open row is drawn
+	// on the header, and the trailing chevron is anchored to the header's inline end
+	// so it lands AFTER the actions. Both need the actions to be the header's last
+	// child; reordering them would silently put the chevron back in the middle.
+	it('keeps the actions last in the header, so the trailing chevron clears them', () => {
+		const fixture = TestBed.createComponent(AccordionActionsHost);
+		fixture.detectChanges();
+
+		const header = fixture.nativeElement.querySelector('.hub-panels__accordion-header') as HTMLElement;
+		const children = [...header.children];
+
+		expect(children.at(0)?.classList).toContain('hub-panels__accordion-btn');
+		expect(children.at(-1)?.classList).toContain('hub-panels__accordion-actions');
+	});
+
+	// The chevron moved out of the button's flow into absolute positioning, but it
+	// must stay a CHILD of the button: that is what keeps clicking it a toggle, and
+	// what keeps the actions from being nested inside another control.
+	it('leaves the chevron owned by the disclosure button', () => {
+		const fixture = TestBed.createComponent(AccordionActionsHost);
+		fixture.detectChanges();
+
+		const header = fixture.nativeElement.querySelector('.hub-panels__accordion-header') as HTMLElement;
+		const button = header.querySelector('.hub-panels__accordion-btn') as HTMLElement;
+		const actions = header.querySelector('.hub-panels__accordion-actions') as HTMLElement;
+
+		expect(button.contains(actions)).toBe(false);
+		expect(actions.querySelector('button')).not.toBeNull();
+	});
 });
 
 describe('accordion togglePosition', () => {

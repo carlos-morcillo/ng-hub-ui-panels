@@ -5,6 +5,18 @@ All notable changes to the ng-hub-ui-panels library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [22.8.2] - 2026-07-09
+
+### Fixed
+
+- **The hairline closing an expanded row stopped short of the row's end.** It was an inset `box-shadow` on the disclosure button, which spanned the whole header until 22.8.0 made it `flex: 1 1 auto` to free space for `hubPanelHeadingActions`. With actions present the line ended where they began. It is now drawn on `.hub-panels__accordion-header--expanded`, which always spans the full row, with or without actions.
+- **`togglePosition="end"` put the chevron at the end of the BUTTON, not of the row.** With `hubPanelHeadingActions` the chevron therefore landed *between* the heading and the affordances. The trailing chevron is now anchored to the header's inline end (`position: absolute; inset-inline-end`), so `'end'` means the end of the row, as documented. It remains a child of the disclosure button — clicking it still toggles, and no control is nested inside another. Whatever sits last in the row (the heading, or the actions when present) reserves the glyph's gutter through the new `--hub-panels-accordion-toggle-gutter` custom property. `togglePosition="start"` is unaffected: the chevron stays in flow, leading the heading. Centring uses `inset-block` + `margin-block` rather than `transform`, which is reserved for the open/closed rotation. Logical properties throughout, so both variants mirror under `dir="rtl"`.
+
+### Changed
+
+- **`.hub-panels__accordion-btn` no longer paints the row surface.** 22.8.0 moved it to `.hub-panels__accordion-header` but left the button's own `background-color` in place, calling it harmless. It was not: the button stretches to the header's full height, so its opaque fill covered the parent's inset bottom hairline across the button's width — the line survived only under the actions slot. The button is now `transparent` and the header's surface shows through. `--hub-panels-accordion-btn-bg` and `--hub-panels-accordion-active-bg` still drive the row's colour, read by the header; a consumer who set `background` directly on `.hub-panels__accordion-btn` must move it to the header.
+- **`.hub-panels__accordion-btn` is no longer `position: relative`.** It never established a containing block for anything, and the `z-index` it raises on hover and focus applies to it as a flex item regardless. Dropping it lets the header be the chevron's containing block. A consumer who relied on the button positioning absolutely-positioned heading content must now position that content itself.
+
 ## [22.8.1] - 2026-07-09
 
 ### Fixed

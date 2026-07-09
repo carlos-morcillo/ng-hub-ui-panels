@@ -54,14 +54,30 @@
 	// `hubPanelHeadingActions`, the row affordances beside it. It carries the row
 	// surface so the actions area matches the button in both states.
 	&__accordion-header {
+		// Containing block for the trailing chevron, which is anchored to the ROW's
+		// end rather than the button's — see `&__accordion-btn::after`.
+		position: relative;
 		display: flex;
 		align-items: stretch;
 		margin: 0;
 		background-color: var(--hub-panels-accordion-btn-bg);
 		transition: var(--hub-panels-accordion-transition);
 
+		// Space the trailing chevron occupies at the row's end. Whatever sits last
+		// in the row — the heading, or the actions when present — reserves it, so
+		// nothing runs under the glyph.
+		--hub-panels-accordion-toggle-gutter: calc(
+			var(--hub-panels-accordion-btn-icon-width) + var(--hub-panels-tab-gap)
+		);
+
+		// The hairline that closes an open row belongs to the HEADER, not to the
+		// disclosure button: the button is `flex: 1 1 auto` and yields its trailing
+		// space to `hubPanelHeadingActions`, so a shadow drawn on it stops short of
+		// the row's end. The header always spans the full row, with or without
+		// actions.
 		&--expanded {
 			background-color: var(--hub-panels-accordion-active-bg);
+			box-shadow: inset 0 calc(-1 * var(--hub-panels-accordion-border-width)) 0 var(--hub-panels-accordion-border-color);
 		}
 	}
 
@@ -73,11 +89,20 @@
 		flex-shrink: 0;
 		align-items: center;
 		gap: var(--hub-panels-tab-gap);
-		padding-inline-end: var(--hub-panels-accordion-btn-padding-x);
+		// The actions are last in the row, so they carry the chevron's gutter.
+		padding-inline-end: calc(
+			var(--hub-panels-accordion-btn-padding-x) + var(--hub-panels-accordion-toggle-gutter)
+		);
+	}
+
+	// Without actions the heading is last, so the button carries the gutter itself.
+	&__accordion-header:not(:has(> .hub-panels__accordion-actions)) > .hub-panels__accordion-btn {
+		padding-inline-end: calc(
+			var(--hub-panels-accordion-btn-padding-x) + var(--hub-panels-accordion-toggle-gutter)
+		);
 	}
 
 	&__accordion-btn {
-		position: relative;
 		display: flex;
 		flex: 1 1 auto;
 		align-items: center;
@@ -89,20 +114,39 @@
 		line-height: var(--hub-panels-tab-line-height);
 		text-align: start;
 		color: var(--hub-panels-accordion-btn-color);
-		background-color: var(--hub-panels-accordion-btn-bg);
+		// The HEADER paints the row surface, and this button stretches to its full
+		// height: an opaque background here would cover the parent's inset bottom
+		// hairline across the button's width, leaving the line showing only under
+		// the actions. Stay transparent and let the header's surface through.
+		background-color: transparent;
 		border: 0;
 		border-radius: 0;
 		overflow-anchor: none;
 		transition: var(--hub-panels-accordion-transition);
 		cursor: pointer;
 
-		// Chevron — masked so the icon colour stays tokenized. Pushed to the end of
-		// the row with a logical margin, so it mirrors under `dir="rtl"`.
+		// Chevron — masked so the icon colour stays tokenized, and anchored to the
+		// HEADER's inline end, not the button's. `togglePosition="end"` means the end
+		// of the ROW: with `hubPanelHeadingActions` the button stops before the
+		// affordances, so a chevron laid out in the button's flow would sit *between*
+		// the heading and the actions. It stays a child of the button, so clicking it
+		// still toggles and no control is nested inside another.
+		//
+		// Centred with `inset-block` + `margin-block`, never `transform` — that slot
+		// belongs to the open/closed rotation.
 		&::after {
+			position: absolute;
+			// The actions slot follows the button in the DOM, so it paints over the
+			// chevron's gutter and would swallow the click. The button establishes no
+			// stacking context, so raising the glyph lifts it within the HEADER's,
+			// above that sibling: clicking the chevron reaches the button again.
+			z-index: 1;
+			inset-block: 0;
+			inset-inline-end: var(--hub-panels-accordion-btn-padding-x);
 			flex-shrink: 0;
 			width: var(--hub-panels-accordion-btn-icon-width);
 			height: var(--hub-panels-accordion-btn-icon-width);
-			margin-inline-start: auto;
+			margin-block: auto;
 			content: '';
 			background-color: var(--hub-panels-accordion-icon-active-color);
 			mask-image: var(--hub-panels-accordion-btn-icon-mask);
@@ -113,11 +157,12 @@
 			transition: var(--hub-panels-accordion-btn-icon-transition);
 		}
 
-		// Expanded state (button without the collapsed modifier).
+		// Expanded state (button without the collapsed modifier). Neither the closing
+		// hairline nor the active surface is drawn here — both belong to
+		// `&__accordion-header--expanded`, which spans the row and sits behind this
+		// button rather than under an opaque fill.
 		&:not(.hub-panels__accordion-btn--collapsed) {
 			color: var(--hub-panels-accordion-active-color);
-			background-color: var(--hub-panels-accordion-active-bg);
-			box-shadow: inset 0 calc(-1 * var(--hub-panels-accordion-border-width)) 0 var(--hub-panels-accordion-border-color);
 		}
 
 		&--collapsed::after {
@@ -179,10 +224,20 @@
 	// The flag rides the PANEL, not the container: an accordion nested in a panel
 	// body is a DOM descendant of the outer container, so a descendant selector
 	// here would push the inner chevrons around too.
-	&__panel--toggle-start > .hub-panels__accordion-header .hub-panels__accordion-btn::after {
-		order: -1;
-		margin-inline-start: 0;
-		margin-inline-end: var(--hub-panels-tab-gap);
+	// Leading the heading means leading it IN FLOW, so the chevron comes back out of
+	// the absolute anchoring the trailing variant uses, and nothing reserves an end
+	// gutter any more.
+	&__panel--toggle-start > .hub-panels__accordion-header {
+		--hub-panels-accordion-toggle-gutter: 0px;
+
+		> .hub-panels__accordion-btn::after {
+			position: static;
+			z-index: auto;
+			order: -1;
+			margin-block: 0;
+			margin-inline-start: 0;
+			margin-inline-end: var(--hub-panels-tab-gap);
+		}
 	}
 
 	// Flush accordion: edge-to-edge panels without outer chrome.
