@@ -5,6 +5,12 @@ All notable changes to the ng-hub-ui-panels library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [22.8.1] - 2026-07-09
+
+### Fixed
+
+- **`togglePosition` leaked into a nested accordion.** The chevron placement was a class on the `<hub-panels>` container and a **descendant** selector, so an accordion nested inside a panel body — a DOM descendant of the outer container — inherited the outer chevron side and could not choose its own. The flag now rides each `<hub-panel>` (`.hub-panels__panel--toggle-start`, resolved from its own container through the `host: true` injection) and the rule is scoped to that panel's own header, so a nested accordion keeps its own `togglePosition`.
+
 ## [22.8.0] - 2026-07-09
 
 ### Added

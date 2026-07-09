@@ -120,6 +120,32 @@ describe('accordion togglePosition', () => {
 		expect(container.classList).toContain('hub-panels--toggle-start');
 	});
 
+	it('does not leak the chevron placement into a nested accordion', () => {
+		@Component({
+			standalone: true,
+			imports: [PanelsComponent, PanelComponent],
+			template: `
+				<hub-panels type="accordion" togglePosition="start">
+					<hub-panel heading="Group" class="outer">
+						<hub-panels type="accordion">
+							<hub-panel heading="Field" class="inner">Body</hub-panel>
+						</hub-panels>
+					</hub-panel>
+				</hub-panels>
+			`
+		})
+		class NestedHost {}
+
+		const fixture = TestBed.createComponent(NestedHost);
+		fixture.detectChanges();
+
+		const root = fixture.nativeElement as HTMLElement;
+		// The flag rides the panel, so the inner accordion keeps its own default (`end`)
+		// even though it sits inside a `toggle-start` container.
+		expect((root.querySelector('.outer') as HTMLElement).classList).toContain('hub-panels__panel--toggle-start');
+		expect((root.querySelector('.inner') as HTMLElement).classList).not.toContain('hub-panels__panel--toggle-start');
+	});
+
 	it('never flags toggle-start outside the accordion view', () => {
 		@Component({
 			standalone: true,

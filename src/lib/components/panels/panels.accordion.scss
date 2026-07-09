@@ -175,7 +175,11 @@
 	// `togglePosition="start"`: the chevron leads the heading instead of trailing
 	// it. Only the visual order moves — the DOM is untouched — and the offsets are
 	// logical, so the chevron lands on the right edge under `dir="rtl"`.
-	&--toggle-start .hub-panels__accordion-btn::after {
+	//
+	// The flag rides the PANEL, not the container: an accordion nested in a panel
+	// body is a DOM descendant of the outer container, so a descendant selector
+	// here would push the inner chevrons around too.
+	&__panel--toggle-start > .hub-panels__accordion-header .hub-panels__accordion-btn::after {
 		order: -1;
 		margin-inline-start: 0;
 		margin-inline-end: var(--hub-panels-tab-gap);

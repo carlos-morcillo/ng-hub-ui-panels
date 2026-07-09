@@ -73,6 +73,7 @@ let nextPanelId = 0;
 		'[style.--hub-panels-card-accent]': 'cardAccent()',
 		'[class.hub-panels__panel--active]': 'active()',
 		'[class.hub-panels__panel--accordion]': 'accordionView()',
+		'[class.hub-panels__panel--toggle-start]': 'toggleAtStart()',
 		'[class.hub-panels__panel--card]': 'cardView() && !alertView()',
 		'[class.hub-panels__panel--alert]': 'alertView()',
 		'[class.hub-panels__panel--fill]': 'fill()',
@@ -203,6 +204,17 @@ export class PanelComponent implements OnDestroy {
 
 	/** Whether the owning container renders the accordion visualization. */
 	protected readonly accordionView = computed(() => !this.standalone && (this.tabset?.isAccordionView() ?? false));
+
+	/**
+	 * Whether this panel's disclosure chevron leads the header row.
+	 *
+	 * Resolved on the PANEL, not on the container: a nested accordion is a DOM descendant of
+	 * the outer one, so a descendant selector on the container would leak the outer chevron
+	 * placement into every accordion inside its panels.
+	 */
+	protected readonly toggleAtStart = computed(
+		() => this.accordionView() && this.tabset?.togglePosition() === 'start'
+	);
 
 	/**
 	 * Whether this panel renders as a card: either inside a `<hub-panels
