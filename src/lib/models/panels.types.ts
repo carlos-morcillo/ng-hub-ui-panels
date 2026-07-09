@@ -8,6 +8,13 @@ import type { PanelComponent } from '../components/panel/panel.component';
 export type PanelsType = 'tabs' | 'pills' | 'accordion' | 'card';
 
 /**
+ * Side of the accordion header row the disclosure chevron sits on. `'end'`
+ * (the default) trails the heading; `'start'` leads it. Resolved with logical
+ * properties, so `'start'` means the left edge in LTR and the right edge in RTL.
+ */
+export type HubPanelsTogglePosition = 'start' | 'end';
+
+/**
  * Visual appearance of a standalone `<hub-panel>`: a plain `card` container or
  * a semantic `alert` callout. The `alert` appearance derives its colours from
  * the design-system semantic tokens, selected through {@link HubPanelVariant}.

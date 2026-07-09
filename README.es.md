@@ -116,7 +116,8 @@ sí mismo.
 - **Acento de la tira** — `<hub-panels variant>` recolorea la tira de navegación (tab activa/hover, pill activa, cabecera de accordion activa) desde un único acento semántico; las variantes integradas usan los tintes exactos del design system y cualquier acento personalizado se aplica automáticamente.
 - **Teclado y accesibilidad** — tabindex móvil, teclas Flecha/Home/End/Delete y roles `role="tablist"`/`tab`/`tabpanel` y semántica `aria-expanded`/`aria-controls` para accordion.
 - **Layout de la tira** — tiras de cabeceras `vertical`, `justified` y `scrollable`.
-- **Opciones de accordion** — expansión `multiple` y layout `flush` a sangre, con colapso animado basado en grid.
+- **Opciones de accordion** — expansión `multiple`, layout `flush` a sangre y lado del chevron con `togglePosition` (`end` por defecto, consciente de RTL), con colapso animado basado en grid.
+- **Acciones de fila del accordion** — `hubPanelHeadingActions` proyecta controles reales junto al botón de despliegue (nunca dentro), de modo que un lápiz o una papelera siguen siendo válidos, alcanzables por teclado y visibles con la fila plegada.
 - **Cabeceras personalizadas** — proyecta cualquier marcado con la directiva `hubPanelHeading`.
 - **Paneles eliminables** — paneles `removable` que se cierran con un botón ✕ o la tecla Delete.
 - **Theming** — cada token es una variable CSS `--hub-panels-*`; la vista accordion también respeta el contrato `--hub-accordion-*`.
@@ -166,6 +167,48 @@ npm install ng-hub-ui-panels
 	<hub-panel heading="Envío">…</hub-panel>
 	<hub-panel heading="Devoluciones">…</hub-panel>
 </hub-panels>
+```
+
+#### Acciones de fila — `hubPanelHeadingActions`
+
+`hubPanelHeading` se proyecta **dentro** del `<button>` de despliegue, así que no
+puede alojar controles: un `<button>` anidado en otro botón es HTML inválido y no
+se alcanza con el teclado. `hubPanelHeader` tampoco vale — vive dentro de la región
+colapsable y desaparece al cerrar la fila.
+
+`hubPanelHeadingActions` es la ranura para las afordancias de fila que deben seguir
+siendo usables con la fila plegada. Se renderiza en la cabecera, **al lado** del
+botón, de modo que sus controles son controles de verdad y un clic nunca despliega
+el panel.
+
+```html
+<hub-panels type="accordion" multiple>
+	<hub-panel>
+		<ng-template hubPanelHeading>Dirección de envío</ng-template>
+		<ng-template hubPanelHeadingActions>
+			<button type="button" (click)="edit()">Editar</button>
+			<button type="button" (click)="remove()">Eliminar</button>
+		</ng-template>
+		…
+	</hub-panel>
+</hub-panels>
+```
+
+#### Lado del chevron — `togglePosition`
+
+`'end'` (por defecto) deja el chevron detrás del encabezado; `'start'` lo pone
+delante. Solo cambia el orden visual — el DOM no se toca — y los desplazamientos son
+lógicos, así que bajo `dir="rtl"` el chevron cae en el borde derecho sin una regla
+extra.
+
+```html
+<hub-panels type="accordion" togglePosition="start">…</hub-panels>
+```
+
+Fija el valor por defecto de toda la app con `PanelsConfig`:
+
+```ts
+providers: [{ provide: PanelsConfig, useValue: { ...new PanelsConfig(), togglePosition: 'start' } }];
 ```
 
 ### Cards

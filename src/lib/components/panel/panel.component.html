@@ -1,5 +1,5 @@
 @if (accordionView()) {
-	<h2 class="hub-panels__accordion-header">
+	<h2 class="hub-panels__accordion-header" [class.hub-panels__accordion-header--expanded]="active()">
 		<button
 			type="button"
 			class="hub-panels__accordion-btn"
@@ -20,6 +20,15 @@
 				<span class="hub-panels__remove-btn" aria-hidden="true" (click)="$event.stopPropagation(); removeSelf()">&times;</span>
 			}
 		</button>
+
+		<!-- Row affordances live OUTSIDE the disclosure button: a control nested
+			 in another control is invalid and unreachable by keyboard. They stay
+			 visible while the row is collapsed, unlike `hubPanelHeader`. -->
+		@if (headingActionsRef(); as actionsTemplate) {
+			<span class="hub-panels__accordion-actions">
+				<ng-container [ngTemplateOutlet]="actionsTemplate" />
+			</span>
+		}
 	</h2>
 }
 

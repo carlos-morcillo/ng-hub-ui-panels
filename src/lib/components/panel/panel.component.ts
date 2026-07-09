@@ -194,6 +194,13 @@ export class PanelComponent implements OnDestroy {
 	/** Custom header template registered by `PanelHeadingDirective`. */
 	readonly headingRef = signal<TemplateRef<unknown> | undefined>(undefined);
 
+	/**
+	 * Header actions template registered by `PanelHeadingActionsDirective`.
+	 * Rendered beside the accordion disclosure button — never inside it — so
+	 * real `<button>`s stay valid and reachable while the row is collapsed.
+	 */
+	readonly headingActionsRef = signal<TemplateRef<unknown> | undefined>(undefined);
+
 	/** Whether the owning container renders the accordion visualization. */
 	protected readonly accordionView = computed(() => !this.standalone && (this.tabset?.isAccordionView() ?? false));
 

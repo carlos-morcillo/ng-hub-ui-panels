@@ -25,6 +25,8 @@
 			border-start-start-radius: var(--hub-panels-accordion-border-radius);
 			border-start-end-radius: var(--hub-panels-accordion-border-radius);
 
+			// The header row carries the surface, so it must round with the button.
+			> .hub-panels__accordion-header,
 			> .hub-panels__accordion-header .hub-panels__accordion-btn {
 				border-start-start-radius: var(--hub-panels-accordion-inner-border-radius);
 				border-start-end-radius: var(--hub-panels-accordion-inner-border-radius);
@@ -35,6 +37,7 @@
 			border-end-start-radius: var(--hub-panels-accordion-border-radius);
 			border-end-end-radius: var(--hub-panels-accordion-border-radius);
 
+			> .hub-panels__accordion-header:not(.hub-panels__accordion-header--expanded),
 			> .hub-panels__accordion-header .hub-panels__accordion-btn--collapsed {
 				border-end-start-radius: var(--hub-panels-accordion-inner-border-radius);
 				border-end-end-radius: var(--hub-panels-accordion-inner-border-radius);
@@ -47,21 +50,44 @@
 		}
 	}
 
+	// The header row hosts the disclosure button and, when the consumer supplies
+	// `hubPanelHeadingActions`, the row affordances beside it. It carries the row
+	// surface so the actions area matches the button in both states.
 	&__accordion-header {
+		display: flex;
+		align-items: stretch;
 		margin: 0;
+		background-color: var(--hub-panels-accordion-btn-bg);
+		transition: var(--hub-panels-accordion-transition);
+
+		&--expanded {
+			background-color: var(--hub-panels-accordion-active-bg);
+		}
+	}
+
+	// Row affordances (edit, delete, a menu): outside the disclosure button, so
+	// they may be real controls, and outside the collapse region, so they stay
+	// visible while the row is closed.
+	&__accordion-actions {
+		display: flex;
+		flex-shrink: 0;
+		align-items: center;
+		gap: var(--hub-panels-tab-gap);
+		padding-inline-end: var(--hub-panels-accordion-btn-padding-x);
 	}
 
 	&__accordion-btn {
 		position: relative;
 		display: flex;
+		flex: 1 1 auto;
 		align-items: center;
-		width: 100%;
+		min-width: 0;
 		gap: var(--hub-panels-tab-gap);
 		padding: var(--hub-panels-accordion-btn-padding-y) var(--hub-panels-accordion-btn-padding-x);
 		font-family: var(--hub-panels-tab-font-family);
 		font-size: var(--hub-panels-tab-font-size);
 		line-height: var(--hub-panels-tab-line-height);
-		text-align: left;
+		text-align: start;
 		color: var(--hub-panels-accordion-btn-color);
 		background-color: var(--hub-panels-accordion-btn-bg);
 		border: 0;
@@ -70,12 +96,13 @@
 		transition: var(--hub-panels-accordion-transition);
 		cursor: pointer;
 
-		// Chevron — masked so the icon colour stays tokenized.
+		// Chevron — masked so the icon colour stays tokenized. Pushed to the end of
+		// the row with a logical margin, so it mirrors under `dir="rtl"`.
 		&::after {
 			flex-shrink: 0;
 			width: var(--hub-panels-accordion-btn-icon-width);
 			height: var(--hub-panels-accordion-btn-icon-width);
-			margin-left: auto;
+			margin-inline-start: auto;
 			content: '';
 			background-color: var(--hub-panels-accordion-icon-active-color);
 			mask-image: var(--hub-panels-accordion-btn-icon-mask);
@@ -143,6 +170,15 @@
 			padding-top: 0;
 			padding-bottom: 0;
 		}
+	}
+
+	// `togglePosition="start"`: the chevron leads the heading instead of trailing
+	// it. Only the visual order moves — the DOM is untouched — and the offsets are
+	// logical, so the chevron lands on the right edge under `dir="rtl"`.
+	&--toggle-start .hub-panels__accordion-btn::after {
+		order: -1;
+		margin-inline-start: 0;
+		margin-inline-end: var(--hub-panels-tab-gap);
 	}
 
 	// Flush accordion: edge-to-edge panels without outer chrome.

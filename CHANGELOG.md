@@ -5,6 +5,21 @@ All notable changes to the ng-hub-ui-panels library will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [22.8.0] - 2026-07-09
+
+### Added
+
+- **`hubPanelHeadingActions` directive** — a header-row slot for accordion affordances that must stay usable while the row is collapsed (edit, delete, a menu). Until now there was nowhere to put them: `hubPanelHeading` projects **inside** the disclosure `<button>`, so a nested `<button>` there is invalid HTML and unreachable by keyboard, and `hubPanelHeader` projects inside the collapse region, so it vanishes when the row closes. Consumers were pushed into `<span role="button" tabindex="0">` look-alikes. The new `<ng-template hubPanelHeadingActions>` renders as a **sibling of the disclosure button**, inside `.hub-panels__accordion-header`: its controls are real controls, a click never toggles the panel (no `stopPropagation` needed), and tab order follows the DOM. Renders nothing in the `tabs` / `pills` / `card` views. Exported as `PanelHeadingActionsDirective`.
+- **`togglePosition` input on `<hub-panels>`** (`'start' | 'end'`, default `'end'`; also settable app-wide through `PanelsConfig.togglePosition`) — which side of the accordion header row the disclosure chevron sits on. Only the visual order changes: the DOM is untouched, and the placement is expressed with logical properties, so `'start'` is the left edge in LTR and the right edge in RTL. Replaces the `::ng-deep .hub-panels__accordion-btn::after { order: -1; margin-left: 0 }` override consumers had to write by hand. The `HubPanelsTogglePosition` type is exported.
+
+### Changed
+
+- **`.hub-panels__accordion-header` is now a flex row** that carries the row surface (`--hub-panels-accordion-btn-bg`, and `--hub-panels-accordion-active-bg` through the new `.hub-panels__accordion-header--expanded` modifier), with the disclosure button as its `flex: 1 1 auto` child. That is what lets the actions slot sit beside the button and share its background in both states. The button's own background rules are unchanged, so existing themes render identically.
+
+### Fixed
+
+- **RTL in the accordion header.** The disclosure button used the physical `text-align: left`, and its chevron `margin-left: auto`, so under `dir="rtl"` the label stayed left-aligned and the chevron pinned to the wrong edge. Both are logical now (`text-align: start`, `margin-inline-start: auto`).
+
 ## [22.7.0] - 2026-07-08
 
 ### Added

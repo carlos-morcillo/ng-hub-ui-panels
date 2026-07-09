@@ -115,7 +115,8 @@ its own.
 - **Routing** — a panel with a `routerLink` turns the content area into a `<router-outlet>` that follows the URL.
 - **Keyboard & a11y** — roving tabindex, Arrow/Home/End/Delete keys, and correct `role="tablist"`/`tab`/`tabpanel` and accordion `aria-expanded`/`aria-controls` semantics.
 - **Strip layout** — `vertical`, `justified` and `scrollable` header strips.
-- **Accordion options** — `multiple` expansion and edge-to-edge `flush` layout, with an animated grid-based collapse.
+- **Accordion options** — `multiple` expansion, edge-to-edge `flush` layout and a `togglePosition` chevron side (`end` by default, RTL-aware), with an animated grid-based collapse.
+- **Accordion row actions** — `hubPanelHeadingActions` projects real controls beside the disclosure button (never inside it), so an edit/delete affordance stays valid, keyboard-reachable and visible while the row is collapsed.
 - **Custom headers** — project any markup with the `hubPanelHeading` directive.
 - **Removable panels** — opt-in `removable` panels close with a ✕ button or the Delete key.
 - **Theming** — every token is a `--hub-panels-*` CSS custom property; the accordion view also honours the `--hub-accordion-*` contract.
@@ -165,6 +166,46 @@ npm install ng-hub-ui-panels
 	<hub-panel heading="Shipping">…</hub-panel>
 	<hub-panel heading="Returns">…</hub-panel>
 </hub-panels>
+```
+
+#### Row actions — `hubPanelHeadingActions`
+
+`hubPanelHeading` projects **inside** the disclosure `<button>`, so it cannot host
+controls: a `<button>` nested in another button is invalid HTML and unreachable by
+keyboard. `hubPanelHeader` is no help either — it lives inside the collapse region
+and disappears when the row closes.
+
+`hubPanelHeadingActions` is the slot for row affordances that must stay usable while
+the row is collapsed. It renders in the header row, **beside** the button, so its
+controls are real controls and a click never toggles the panel.
+
+```html
+<hub-panels type="accordion" multiple>
+	<hub-panel>
+		<ng-template hubPanelHeading>Shipping address</ng-template>
+		<ng-template hubPanelHeadingActions>
+			<button type="button" (click)="edit()">Edit</button>
+			<button type="button" (click)="remove()">Delete</button>
+		</ng-template>
+		…
+	</hub-panel>
+</hub-panels>
+```
+
+#### Chevron side — `togglePosition`
+
+`'end'` (default) trails the heading with the chevron; `'start'` leads it. Only the
+visual order changes — the DOM is untouched — and the offsets are logical, so the
+chevron lands on the right edge under `dir="rtl"` without any extra rule.
+
+```html
+<hub-panels type="accordion" togglePosition="start">…</hub-panels>
+```
+
+Set the default for the whole app through `PanelsConfig`:
+
+```ts
+providers: [{ provide: PanelsConfig, useValue: { ...new PanelsConfig(), togglePosition: 'start' } }];
 ```
 
 ### Cards

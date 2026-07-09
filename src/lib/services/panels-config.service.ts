@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import type { PanelsType } from '../models/panels.types';
+import type { HubPanelsTogglePosition, PanelsType } from '../models/panels.types';
 
 /**
  * Injectable defaults for every `<hub-panels>` in the application.
@@ -19,6 +19,9 @@ export class PanelsConfig {
 
 	/** Whether keyboard navigation (arrows / Home / End / Delete) is enabled. */
 	isKeysAllowed = true;
+
+	/** Accordion view: default side of the header row for the disclosure chevron. */
+	togglePosition: HubPanelsTogglePosition = 'end';
 
 	/** Accessible label announced for the panel list. */
 	ariaLabel = 'Tabs';

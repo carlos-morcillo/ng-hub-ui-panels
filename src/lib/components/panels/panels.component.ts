@@ -23,7 +23,12 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 
-import type { HubPanelVariant, PanelChangeEvent, PanelsType } from '../../models/panels.types';
+import type {
+	HubPanelsTogglePosition,
+	HubPanelVariant,
+	PanelChangeEvent,
+	PanelsType
+} from '../../models/panels.types';
 import { PanelsConfig } from '../../services/panels-config.service';
 import { contentBoxWidth } from '../../utils/content-box-width';
 import { readByPath } from '../../utils/read-by-path';
@@ -93,6 +98,7 @@ interface MultipleHeaderGroup {
 		'[class.hub-panels--card]': 'isCardView()',
 		'[class.hub-panels--vertical]': 'vertical() && !isAccordionView() && !isCardView()',
 		'[class.hub-panels--accordion]': 'isAccordionView()',
+		'[class.hub-panels--toggle-start]': "isAccordionView() && togglePosition() === 'start'",
 		'[class.hub-panels--flush]': 'isAccordionView() && flush()',
 		'[class.hub-panels--multiple]': 'multiple()',
 		'[attr.data-variant]': 'variant() ?? null',
@@ -152,6 +158,14 @@ export class PanelsComponent implements ControlValueAccessor {
 
 	/** Accordion view: edge-to-edge panels without outer borders or radius. */
 	readonly flush = input(false, { transform: booleanAttribute });
+
+	/**
+	 * Accordion view: which side of the header row the disclosure chevron sits
+	 * on — `'end'` (default) trails the heading, `'start'` leads it. Purely
+	 * visual: the DOM order never changes, and the placement is expressed with
+	 * logical properties, so it mirrors automatically under `dir="rtl"`.
+	 */
+	readonly togglePosition = input<HubPanelsTogglePosition>(this.config.togglePosition);
 
 	/**
 	 * Semantic accent applied to the navigation strip — the active/hover tab, the
