@@ -66,9 +66,7 @@
 		// Space the trailing chevron occupies at the row's end. Whatever sits last
 		// in the row — the heading, or the actions when present — reserves it, so
 		// nothing runs under the glyph.
-		--hub-panels-accordion-toggle-gutter: calc(
-			var(--hub-panels-accordion-btn-icon-width) + var(--hub-panels-tab-gap)
-		);
+		--hub-panels-accordion-toggle-gutter: calc(var(--hub-panels-accordion-btn-icon-width) + var(--hub-panels-tab-gap));
 
 		// The hairline that closes an open row belongs to the HEADER, not to the
 		// disclosure button: the button is `flex: 1 1 auto` and yields its trailing
